@@ -99,6 +99,12 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 4)
                 {
+                    //display users
+                    Console.WriteLine("Enter ID of user you are sending to (press 0 to cancel): ");
+                    int input = int.Parse(Console.ReadLine().Trim());
+
+                    Console.WriteLine("Enter amount to transfer: ");
+                    double moneyToSend = double.Parse(Console.ReadLine());
 
                 }
                 else if (menuSelection == 5)
