@@ -9,10 +9,7 @@ namespace TenmoClient
     {
         private static readonly ConsoleService consoleService = new ConsoleService();
         private static readonly AuthService authService = new AuthService();
-        private decimal _currentBalance = 0M;
-        public decimal CurrentBalance { get { return _currentBalance; } }
-
-        IUserDAO userDao = new UserSqlDAO(@"Data Source =.\SQLEXPRESS;Initial Catalog = tenmo; Integrated Security = True");
+        
         static void Main(string[] args)
         {
             Run();
@@ -91,7 +88,6 @@ namespace TenmoClient
                 else if (menuSelection == 1)
                 {
 
-                    Console.WriteLine($"Your current Balance is {_currentBalance}"); 
                 }
                 else if (menuSelection == 2)
                 {
