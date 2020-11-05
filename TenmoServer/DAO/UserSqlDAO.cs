@@ -128,6 +128,15 @@ namespace TenmoServer.DAO
 
             return u;
         }
-       
+
+        public User GetBalance(double amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public User Update(int id, User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

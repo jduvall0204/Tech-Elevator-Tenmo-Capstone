@@ -73,14 +73,15 @@ namespace TenmoServer.DAO
 
         public bool GetTransfer(Transfers transfer)
         {
-            if(!UpdateBalance(transfer.ToUserId, transfer.TransferAmount))
+            if(!UpdateBalance(transfer.AccountTo, transfer.Amount))
             {
                 return false;
             }
-            if (!UpdateBalance(transfer.FromUserId, - transfer.TransferAmount))
+            if (!UpdateBalance(transfer.AccountFrom, - transfer.Amount))
             {
-                return true;
+                return false;
             }
+            return true;
         }
 
         public bool UpdateBalance(int userId, decimal amount)
