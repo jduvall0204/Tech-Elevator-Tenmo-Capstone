@@ -15,10 +15,10 @@ namespace TenmoServer.DAO
         {
             connectionString = dbConnectionString;
         }
-        public bool AddTransfer(Transfer transfer)
+        public TransferWithDetails SendMoney(int senderId, int receiverId, decimal amount)
         {
-            var transfer = new Transfers();
-            var returnTransfer = new Transfers();
+            var transfer = new Transfer();
+            var returnTransfer = new TransferWithDetails();
 
             try
             {
@@ -57,9 +57,10 @@ namespace TenmoServer.DAO
 
             return returnTransfer;
         }
-        public List<Transfer> GetTransfers(string username)
+
+        public List<TransferWithDetails> GetTransferHistory(int userId)
         {
-            List<Transfer> returnTransfers = new List<Transfer>();
+            var allTransfers = new List<TransferWithDetails>();
 
             try
             {
@@ -77,7 +78,9 @@ namespace TenmoServer.DAO
                         while (reader.Read())
                         {
                             Transfer transfer = GetTransferFromReader(reader);
-                            returnTransfers.Add(transfer);
+                            TransferWithDetails details = GetDetailsFromTransfer(transfer);
+
+                            allTransfers.Add(details);
                         }
                     }
                 }
@@ -89,9 +92,9 @@ namespace TenmoServer.DAO
 
             return allTransfers;
         }
-        public Transfer GetTransferFromID(int transferID)
+        public TransferWithDetails GetTransfer(int transferId)
         {
-            var transfer = new Transfers();
+            var transfer = new Transfer();
 
             try
             {
@@ -106,12 +109,7 @@ namespace TenmoServer.DAO
 
                     if (reader.HasRows && reader.Read())
                     {
-                        Transfer transfer = new Transfer();
-                        while (reader.Read())
-                        {
-                            transfer = GetTransferFromReader(reader);
-                        }
-                        return transfer;
+                        transfer = GetTransferFromReader(reader);
                     }
                 }
             }
@@ -122,7 +120,7 @@ namespace TenmoServer.DAO
 
             return GetDetailsFromTransfer(transfer);
         }
-        public bool UpdateTransfer(Transfer transfer)
+        public string GetTypeFromTransfer(int transferTypeId)
         {
             string transferType = "";
             try
@@ -207,15 +205,29 @@ namespace TenmoServer.DAO
         }
         private Transfer GetTransferFromReader(SqlDataReader reader)
         {
-            Transfer transfers = new Transfer();
-            transfers.TransferId = Convert.ToInt32(reader["transfer_id"]);
-            transfers.TransferTypeId = Convert.ToInt32(reader["transfer_type_id"]);
-            transfers.TransferStatusId = Convert.ToInt32(reader["transfer_status_id"]);
-            transfers.AccountFrom = Convert.ToInt32(reader["account_from"]);
-            transfers.AccountTo = Convert.ToInt32(reader["account_to"]);
-            transfers.Amount = Convert.ToDecimal(reader["amount"]);
+            Transfer t = new Transfer();
 
-            return transfers;
+            t.TransferId = Convert.ToInt32(reader["transfer_id"]);
+            t.TransferTypeId = Convert.ToInt32(reader["transfer_type_id"]);
+            t.TransferStatusId = Convert.ToInt32(reader["transfer_status_id"]);
+            t.AccountFrom = Convert.ToInt32(reader["account_from"]);
+            t.AccountTo = Convert.ToInt32(reader["account_to"]);
+            t.Amount = Convert.ToDecimal(reader["amount"]);
+
+            return t;
+        }
+        private TransferWithDetails GetDetailsFromTransfer(Transfer transfer)
+        {
+            var transferDetails = new TransferWithDetails();
+
+            transferDetails.TransferId = transfer.TransferId;
+            transferDetails.TransferType = GetTypeFromTransfer(transfer.TransferTypeId);
+            transferDetails.TransferStatus = GetStatusFromTransfer(transfer.TransferStatusId);
+            transferDetails.FromUser = GetUsernameFromAccount(transfer.AccountFrom);
+            transferDetails.ToUser = GetUsernameFromAccount(transfer.AccountTo);
+            transferDetails.Amount = transfer.Amount;
+
+            return transferDetails;
         }
     }
 }
