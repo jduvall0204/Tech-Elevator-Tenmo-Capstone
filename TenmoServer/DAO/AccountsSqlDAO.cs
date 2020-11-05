@@ -7,7 +7,7 @@ using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
-    public class AccountsSqlDAO
+    public class AccountsSqlDAO : IAccountsDAO
     {
 
         private string connectionString;

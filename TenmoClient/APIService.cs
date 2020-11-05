@@ -117,7 +117,7 @@ namespace TenmoClient
             }
         }
 
-        public Accounts GetBalance (int balance, int userId)
+        public Accounts GetBalance (int userId)
         {
 
             //userId
