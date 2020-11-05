@@ -19,7 +19,7 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "user/all");
+            RestRequest request = new RestRequest(API_URL + "users");
             IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
@@ -37,7 +37,7 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "user/others");
+            RestRequest request = new RestRequest(API_URL + "users");
             IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
@@ -55,7 +55,7 @@ namespace TenmoClient
             {
                 client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-                RestRequest request = new RestRequest(API_URL + "transfer/request");
+                RestRequest request = new RestRequest(API_URL + "transfers");
                 request.AddJsonBody(transfers);
                 IRestResponse<API_Transfer> response = client.Post<API_Transfer>(request);
               
@@ -88,7 +88,7 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "accounts/");
+            RestRequest request = new RestRequest(API_URL + "accounts");
             IRestResponse<decimal> response = client.Get<decimal>(request);
 
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
