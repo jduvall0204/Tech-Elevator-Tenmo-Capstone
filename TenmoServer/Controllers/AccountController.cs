@@ -46,44 +46,44 @@ namespace TenmoServer.Controllers
         }
 
         //Update Recipient Balance - update Recipients(id) Current Balance
-        [HttpPut("account/{id}/balance")]
-        public ActionResult<User> UpdateRecipientBalance(int id, double balance) // User should be Account
-        {
-            User recipientBalance = userDAO.GetBalance(id);
-            if (recipientBalance == null)
-            {
-                return NotFound("Balance does not exist"); //sql command existing balance that belongs to user ID, take that 
-            }
+        //[HttpPut("account/{id}/balance")]
+        //public ActionResult<User> UpdateRecipientBalance(int id, double balance) // User should be Account
+        //{
+        //    User recipientBalance = userDAO.GetBalance(id);
+        //    if (recipientBalance == null)
+        //    {
+        //        return NotFound("Balance does not exist"); //sql command existing balance that belongs to user ID, take that 
+        //    }
 
-            User result = userDAO.Update(id, balance);
-            return Ok(result);
-        }
+        //    User result = userDAO.Update(id, balance);
+        //    return Ok(result);
+        //}
 
-        //Update Sender Balance - update current users Current Balance
-        [HttpPut("account/{id}/balance")]
-        public ActionResult<User> UpdateSenderBalance(int id, User balance) // User should be Account
-        {
-            User recipientBalance = userDAO.GetBalance(id);
-            if (recipientBalance == null)
-            {
-                return NotFound("Balance does not exist");
-            }
+        ////Update Sender Balance - update current users Current Balance
+        //[HttpPut("account/{id}/balance")]
+        //public ActionResult<User> UpdateSenderBalance(int id, User balance) // User should be Account
+        //{
+        //    User recipientBalance = userDAO.GetBalance(id);
+        //    if (recipientBalance == null)
+        //    {
+        //        return NotFound("Balance does not exist");
+        //    }
 
-            User result = userDAO.Update(id, balance);
-            return Ok(result);
-        }
-        //Get list of all transfers
-        [HttpGet("account/transfers")]
-        public ActionResult<List<Transfers>> GetTransfers() // User should be Transfer
-        {
-            return Ok(userDAO.GetTransfers());
-        }
+        //    User result = userDAO.Update(id, balance);
+        //    return Ok(result);
+        //}
+        ////Get list of all transfers
+        //[HttpGet("account/transfers")]
+        //public ActionResult<List<Transfers>> GetTransfers() // User should be Transfer
+        //{
+        //    return Ok(userDAO.GetTransfers());
+        //}
 
-        //Get Transfer with Id from List - Past Transfer
-        [HttpGet("account/{id}/transfers")]
-        public ActionResult<List<Transfers>> GetTransfers(int Id) // User should be Transfer
-        {
-            return Ok(userDAO.GetTransfers(Id));
-        }
+        ////Get Transfer with Id from List - Past Transfer
+        //[HttpGet("account/{id}/transfers")]
+        //public ActionResult<List<Transfers>> GetTransfers(int Id) // User should be Transfer
+        //{
+        //    return Ok(userDAO.GetTransfers(Id));
+        //}
     }
 }
