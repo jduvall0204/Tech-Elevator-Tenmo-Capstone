@@ -62,10 +62,10 @@ namespace TenmoServer.Controllers
             }
         }
         [HttpPost]
-        public ActionResult<TransferWithDetails> SendMoney(Transfer newTransfer)
+        public ActionResult<TransferWithDetails> SendMoney(NewTransfer newTransfer)
         {
             int userId = GetId();
-            Account accountFrom = accountDAO.GetAccount(userId);
+            Account accountFrom = accountDAO.GetAccounts(userId);
 
             if (accountFrom == null)
             {

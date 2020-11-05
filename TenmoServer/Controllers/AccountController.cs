@@ -31,7 +31,7 @@ namespace TenmoServer.Controllers
         {
             int userId = GetId();
 
-            Account account = AccountsSqlDAO.GetAccount(userId);
+            Account account = AccountsDAO.GetAccounts(userId);
 
             if (account != null)
             {

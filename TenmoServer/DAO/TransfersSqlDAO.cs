@@ -176,7 +176,7 @@ namespace TenmoServer.DAO
 
         public string GetUsernameFromAccount(int accountId)
         {
-            AccountUsername username = new AccountUsername();
+            User username = new User();
 
             try
             {
