@@ -16,7 +16,7 @@ namespace TenmoServer.DAO
         {
             connectionString = dbConnectionString;
         }
-        public bool AddTransfer(Transfers transfer)
+        public bool AddTransfer(Transfer transfer)
         {
             try
             {
@@ -44,9 +44,9 @@ namespace TenmoServer.DAO
             }
             return true;
         }
-        public List<Transfers> GetTransfers(string username)
+        public List<Transfer> GetTransfers(string username)
         {
-            List<Transfers> returnTransfers = new List<Transfers>();
+            List<Transfer> returnTransfers = new List<Transfer>();
 
             try
             {
@@ -73,7 +73,7 @@ namespace TenmoServer.DAO
                     {
                         while (reader.Read())
                         {
-                            Transfers transfer = GetTransferFromReader(reader);
+                            Transfer transfer = GetTransferFromReader(reader);
                             returnTransfers.Add(transfer);
                         }
                     }
@@ -86,7 +86,7 @@ namespace TenmoServer.DAO
 
             return returnTransfers;
         }
-        public Transfers GetTransferFromID(int transferID)
+        public Transfer GetTransferFromID(int transferID)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace TenmoServer.DAO
 
                     if (reader.HasRows)
                     {
-                        Transfers transfer = new Transfers();
+                        Transfer transfer = new Transfer();
                         while (reader.Read())
                         {
                             transfer = GetTransferFromReader(reader);
@@ -126,7 +126,7 @@ namespace TenmoServer.DAO
             }
             return null;
         }
-        public bool UpdateTransfer(Transfers transfer)
+        public bool UpdateTransfer(Transfer transfer)
         {
             try
             {
@@ -148,9 +148,9 @@ namespace TenmoServer.DAO
             }
             return true;
         }
-        private Transfers GetTransferFromReader(SqlDataReader reader)
+        private Transfer GetTransferFromReader(SqlDataReader reader)
         {
-            Transfers transfers = new Transfers();
+            Transfer transfers = new Transfer();
             transfers.TransferId = Convert.ToInt32(reader["transfer_id"]);
             transfers.TransferTypeId = Convert.ToInt32(reader["transfer_type_id"]);
             transfers.TransferStatusId = Convert.ToInt32(reader["transfer_status_id"]);

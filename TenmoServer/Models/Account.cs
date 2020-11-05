@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TenmoServer.Models
 {
-    public class Accounts
+    public class Account
     {
         public int AccountId { get; set; }
         [Required(ErrorMessage = "You need to enter the account ID.")]
@@ -14,9 +14,10 @@ namespace TenmoServer.Models
         public decimal Balance { get; set; }
 
 
-        public override string ToString()
-        {
-            return AccountId.ToString() + UserId.ToString() + Balance.ToString();
-        }
+        
+    }
+    public class AccountUserName
+    {
+        public string Username { get; set; }
     }
 }

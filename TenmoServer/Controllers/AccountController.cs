@@ -13,37 +13,45 @@ namespace TenmoServer.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AccountController : ControllerBase
     {
 
-        private readonly ITransfersDAO TransfersDAO;
-        private static IAccountsDAO AccountsDAO;
+        //private readonly ITransfersDAO TransfersDAO;
+        private readonly IAccountsDAO AccountsDAO;
 
-        public AccountController(IAccountsDAO accountsDAO, ITransfersDAO transfersDAO)
+        public AccountController(IAccountsDAO accountsDAO)
         {
             AccountsDAO = accountsDAO;
-            TransfersDAO = transfersDAO;
+
         }
 
         [HttpGet]
-        public ActionResult<decimal> GetAccountBalance()
+        public ActionResult<Account> GetAccount()
         {
-            string userIDString = (User.FindFirst("sub")?.Value);
-            int userId;
-            bool successfulParse = Int32.TryParse(userIDString, out userId);
-            if(!successfulParse)
-            {
-                return StatusCode(500);
-            }
-            decimal? balance = AccountsDAO.GetBalance(userId);
+            int userId = GetId();
 
-            if(balance == null)
+            Account account = AccountsSqlDAO.GetAccount(userId);
+
+            if (account != null)
+            {
+                return Ok(account);
+            }
+            else
             {
                 return NotFound();
             }
-            return Ok(balance);
+
         }
-        
+
+        public int GetId()
+        {
+            int userId = 0;
+            var tokenId = User.FindFirst("sub").Value;
+
+            int.TryParse(tokenId, out userId);
+
+            return userId;
+        }
     }
 }
