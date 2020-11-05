@@ -7,7 +7,7 @@ using TenmoServer.Models;
 
 namespace TenmoServer.DAO
 {
-    public class AccountsSqlDAO
+    public class AccountsSqlDAO : IAccountsDAO
     {
 
         private string connectionString;
@@ -46,6 +46,7 @@ namespace TenmoServer.DAO
         private Accounts GetAccountFromReader(SqlDataReader reader)
         {
             Accounts accounts = new Accounts();
+            accounts.AccountId = Convert.ToInt32(reader["account_id"]);
             accounts.UserId = Convert.ToInt32(reader["user_id"]);
             accounts.Balance = Convert.ToInt32(reader["balance"]);
            

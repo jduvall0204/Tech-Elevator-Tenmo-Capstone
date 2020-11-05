@@ -17,7 +17,8 @@ namespace TenmoServer.Controllers
     public class AccountController : ControllerBase
     {
 
-        private readonly IUserDAO userDAO;
+        private static IUserDAO userDAO;
+        private static IAccountsDAO accountsDAO;
 
         public AccountController(IUserDAO _userDAO)
         {
