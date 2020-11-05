@@ -8,10 +8,10 @@ using TenmoServer.Controllers;
 
 namespace TenmoServer.DAO
 {
-
-    public class AccountsSqlDAO : IAccountsDAO
+    public class AccountsSqlDAO: IAccountsDAO
     {
-        private readonly string connectionString;
+
+        private string connectionString;
 
         public AccountsSqlDAO(string dbConnectionString)
         {
@@ -20,7 +20,6 @@ namespace TenmoServer.DAO
         public Accounts GetAccounts(string username)
         {
             Accounts getAccount = null;
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -44,6 +43,7 @@ namespace TenmoServer.DAO
             }
             return getAccount;
         }
+
         public decimal? GetBalance(int userID)
         {
             Accounts getBalance = null;
@@ -70,18 +70,19 @@ namespace TenmoServer.DAO
             }
             return getBalance.Balance;
         }
+
         public bool GetTransfer(Transfers transfer)
         {
-            if(!UpdateBalance(transfer.AccountTo, transfer.Amount))
+            if(!UpdateBalance(transfer.ToUserId, transfer.TransferAmount))
             {
                 return false;
             }
-            if (!UpdateBalance(transfer.AccountFrom, - transfer.Amount))
+            if (!UpdateBalance(transfer.FromUserId, - transfer.TransferAmount))
             {
-                return false;
+                return true;
             }
-            return true;
         }
+
         public bool UpdateBalance(int userId, decimal amount)
         {
             try
@@ -94,9 +95,9 @@ namespace TenmoServer.DAO
                     cmd.Parameters.AddWithValue("@amount", amount);
                     cmd.Parameters.AddWithValue("@user_id", userId);
 
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
 
-                    return true;
+                    return (rowsAffected > 0);
                 }
             }
             catch (Exception e)
