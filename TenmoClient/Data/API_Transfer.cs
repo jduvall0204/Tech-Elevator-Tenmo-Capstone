@@ -24,7 +24,7 @@ namespace TenmoClient.Data
         public int ReceiverAccount { get; set; }
         public decimal Amount { get; set; }
     }
-    public class TransferWithDetails
+    public class TransferDetails
     {
         public int TransferId { get; set; }
         public string TransferType { get; set; }
