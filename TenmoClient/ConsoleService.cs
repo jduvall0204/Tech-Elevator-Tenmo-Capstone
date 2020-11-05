@@ -75,8 +75,8 @@ namespace TenmoClient
 
         //////adding methods 
 
-        ////public void PrintTransferDetails(Transfers transfer)
-        ////{
+        public void PrintTransferDetails(Transfer transfer)
+        {
 
         ////    Console.WriteLine("Transfer Details");
 

@@ -19,8 +19,8 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "account/");
-            IRestResponse<API_Account> response = client.Get<API_Account>(request);
+            RestRequest request = new RestRequest(API_URL + "users");
+            IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -38,6 +38,8 @@ namespace TenmoClient
             IRestRequest request = new RestRequest(API_URL + "transfer/" + transferId);
             IRestResponse<TransferWithDetails> response = client.Get<TransferWithDetails>(request);
 
+            RestRequest request = new RestRequest(API_URL + "users");
+            IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -54,9 +56,12 @@ namespace TenmoClient
             IRestRequest request = new RestRequest(API_URL + "transfer/history");
             IRestResponse<List<TransferWithDetails>> response = client.Get<List<TransferWithDetails>>(request);
 
-            if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-            {
-                ProcessErrorResponse(response);
+                RestRequest request = new RestRequest(API_URL + "transfers");
+                request.AddJsonBody(transfers);
+                IRestResponse<API_Transfer> response = client.Post<API_Transfer>(request);
+              
+                 
+                return true;
             }
             else
             {
@@ -83,10 +88,10 @@ namespace TenmoClient
         }
         public TransferWithDetails SendMoney(int receiverId, decimal amount)
         {
-            NewTransfer nt = new NewTransfer(receiverId, amount);
-            RestRequest request = new RestRequest(API_URL + $"transfer");
-            request.AddJsonBody(nt);
-            IRestResponse<TransferWithDetails> response = client.Post<TransferWithDetails>(request);
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
+            RestRequest request = new RestRequest(API_URL + "accounts");
+            IRestResponse<decimal> response = client.Get<decimal>(request);
 
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {

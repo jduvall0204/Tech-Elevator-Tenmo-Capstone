@@ -10,30 +10,86 @@ using TenmoServer.Models;
 
 namespace TenmoServer.Controllers
 {
+    
     [Route("[controller]")]
     [ApiController]
     public class TransferController : ControllerBase
     {
-        private readonly IAccountsDAO accountsDAO;
-        private readonly ITransfersDAO transfersDAO;
+        private readonly ITransfersDAO transferDAO;
+        private readonly IAccountsDAO accountDAO;
+        private readonly IUserDAO userDAO;
 
-        public TransferController(IAccountsDAO accountsDAO, ITransfersDAO transfersDAO)
+        public TransferController(ITransfersDAO transferDAO, IAccountsDAO accountDAO, IUserDAO userDAO)
         {
-            this.accountsDAO = accountsDAO;
-            this.transfersDAO = transfersDAO;
+            this.transferDAO = transferDAO;
+            this.accountDAO = accountDAO;
+            this.userDAO = userDAO;
         }
 
         [HttpGet]
-        public ActionResult<List<Transfers>> GetTransfers()
+        public List<User> ListUsers()
         {
-            var transfers = transfersDAO.GetTransfers(User.Identity.Name);
-            if(transfers == null)
+            return userDAO.GetUsers();
+        }
+
+        [HttpGet("{transferId}")]
+        public ActionResult<TransferWithDetails> GetTransferById(int transferId)
+        {
+            TransferWithDetails transfer = transferDAO.GetTransfer(transferId);
+            if (transfer != null)
+            {
+                return Ok(transfer);
+            }
+            else
+            {
+                return NotFound("Transfer does not exist.");
+            }
+        }
+
+        [HttpGet("history")]
+        public ActionResult<List<TransferWithDetails>> ListTransfers()
+        {
+            int userId = GetId();
+            var transferHistory = transferDAO.GetTransferHistory(userId);
+
+            if (transferHistory != null)
+            {
+                return Ok(transferHistory);
+            }
+            else
             {
                 return NotFound();
             }
-            return Ok(transfers);
         }
-        
-            
+        [HttpPost]
+        public ActionResult<TransferWithDetails> SendMoney(Transfer newTransfer)
+        {
+            int userId = GetId();
+            Account accountFrom = accountDAO.GetAccount(userId);
+
+            if (accountFrom == null)
+            {
+                return NotFound("Account does not exist");
+            }
+            if (accountFrom.Balance >= newTransfer.Amount)
+            {
+                TransferWithDetails result = transferDAO.SendMoney(userId, newTransfer.ReceiverAccount, newTransfer.Amount);
+
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+        public int GetId()
+        {
+            int userId = 0;
+            var tokenId = User.FindFirst("sub").Value;
+
+            int.TryParse(tokenId, out userId);
+
+            return userId;
+        }
     }
 }
