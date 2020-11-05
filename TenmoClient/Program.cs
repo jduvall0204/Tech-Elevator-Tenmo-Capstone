@@ -109,7 +109,8 @@ namespace TenmoClient
 
                     int chosenID = consoleService.PromptForTransferID("get details");
 
-                    Func<Transfers, bool> search = t => t.TransferId == chosenID;
+                    Func<API_Transfer, bool> search = t => t.TransferID == chosenID;
+
 
                     //if (transfers.Any(search))
                     //{
