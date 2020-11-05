@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TenmoClient.Data;
 using TenmoServer.DAO;
 using TenmoServer.Models;
@@ -75,9 +76,9 @@ namespace TenmoClient
                 Console.WriteLine("Welcome to TEnmo! Please make a selection: ");
                 Console.WriteLine("1: View your current balance");
                 Console.WriteLine("2: View your past transfers");
-                Console.WriteLine("3: View your pending requests");
+                Console.WriteLine("3: View your pending requests"); //optional
                 Console.WriteLine("4: Send TE bucks");
-                Console.WriteLine("5: Request TE bucks");
+                Console.WriteLine("5: Request TE bucks"); //optional 
                 Console.WriteLine("6: Log in as different user");
                 Console.WriteLine("0: Exit");
                 Console.WriteLine("---------");
@@ -101,20 +102,50 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 2)
                 {
-                   
+                    List<API_Transfer> transfers = apiService.GetTransfer();
+                    if (transfers == null) continue;
+
+                    consoleService.PrintAllTransfers(transfers);
+
+                    int chosenID = consoleService.PromptForTransferID("get details");
+
+                    Func<Transfers, bool> search = t => t.TransferId == chosenID;
+
+                    //if (transfers.Any(search))
+                    //{
+                    //    API_Transfer transfer = transfers.Single(search);
+
+                    //    consoleService.PrintTransferDetails(transfer);
+                    //}
+                    if (chosenID != 0)
+                    {
+                        Console.WriteLine("The transfer ID you requested does not exist.");
+                    }
                 }
+
                 else if (menuSelection == 3)
                 {
 
                 }
                 else if (menuSelection == 4)
                 {
-                    //display users
-                    Console.WriteLine("Enter ID of user you are sending to (press 0 to cancel): ");
-                    int input = int.Parse(Console.ReadLine().Trim());
+                    List<API_User> users = apiService.GetOtherAccounts();
+                    if (users == null) continue;
 
-                    Console.WriteLine("Enter amount to transfer: ");
-                    double moneyToSend = double.Parse(Console.ReadLine());
+                    consoleService.PrintUsers(users);
+                    TransferType transferType = TransferType.Send;
+                    API_Transfer transfer = consoleService.PromptForTransferRequest(transferType);
+
+                    if (!users.Any(u => u.UserId == transfer.ToUserID))
+                    {
+                        Console.WriteLine("The user ID you requested does not exist.");
+                        continue;
+                    }
+
+                    transfer.ToUserName = users.First(u => u.UserId == transfer.ToUserID)?.Username;
+                    apiService.SubmitTransfer(transfer);
+
+                    
 
                 }
                 else if (menuSelection == 5)
@@ -134,25 +165,6 @@ namespace TenmoClient
                 }
             }
 
-        }
-        //helper methods
-       public static  int GetInteger(string message)
-        {
-            int resultValue = 0;
-            while (true)
-            {
-                Console.Write(message + " ");
-                string userInput = Console.ReadLine().Trim();
-                if (int.TryParse(userInput, out resultValue))
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("!!! Invalid input. Please enter a valid whole number.");
-                }
-            }
-            return resultValue;
         }
     }
 }

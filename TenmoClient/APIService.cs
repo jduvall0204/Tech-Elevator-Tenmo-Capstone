@@ -9,7 +9,7 @@ using TenmoServer.Models;
 
 namespace TenmoClient
 {
-    class APIService
+   public class APIService
     {
         private readonly string API_URL = "https://localhost:44315/";
         private readonly RestClient client = new RestClient();
@@ -50,104 +50,27 @@ namespace TenmoClient
             return null;
         }
 
-        //public Accounts UpdateRecipientBalance(User balance, int userId)
-        //{
-        //    //int result = balance? return result? 
-        //    client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-        //    RestRequest request = new RestRequest(API_URL + "accounts/" + balance + userId);
-        //    request.AddJsonBody(balance);
-        //    IRestResponse<Accounts> response = client.Put<Accounts>(request);
-        //    if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-        //    {
-        //        ProcessErrorResponse(response);
-        //    }
-        //    else
-        //    {
-        //        return response.Data;
-        //    }
-        //        return null;
-        //}
-        //public Accounts UpdateSenderBalance(User balance, int userId)
-        //{
-        //    //int result = balance? return result? 
-        //    client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-        //    RestRequest request = new RestRequest(API_URL + "accounts/" + balance + userId);
-        //    request.AddJsonBody(balance);
-        //    IRestResponse<Accounts> response = client.Put<Accounts>(request);
-        //    if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-        //    {
-        //        ProcessErrorResponse(response);
-        //    }
-        //    else
-        //    {
-        //        return response.Data;
-        //    }
-        //    return null;
-        //}
-        //public User Send(string userName, int userId)
-        //{
-        //    client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-        //    RestRequest request = new RestRequest(API_URL + "users/" + userName + userId);
-        //    request.AddJsonBody(userId);
-        //    IRestResponse<User> response = client.Put<User>(request);
-        //    if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-        //    {
-        //        ProcessErrorResponse(response);
-        //    }
-        //    else
-        //    {
-        //        return response.Data;
-        //    }
-        //    return null;
-        //}
-        public bool SubmitTransfer(Transfers transfers)
+        public bool SubmitTransfer(API_Transfer transfers)
         {
             {
                 client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
                 RestRequest request = new RestRequest(API_URL + "transfer/request");
                 request.AddJsonBody(transfers);
-                IRestResponse<Transfers> response = client.Post<Transfers>(request);
+                IRestResponse<API_Transfer> response = client.Post<API_Transfer>(request);
               
                  
                 return true;
             }
         }
-        public bool UpdateTransfer(Transfers transfers, int approvalOption)
-        {
-            if (approvalOption == 1)
-            {
-               // transfers.TransferStatusId == transfers.TransferStatusId;
-            }
-            else if (approvalOption == 2)
-            {
-               // transfers.TransferStatusId;
-            }
-            else 
-                {
-                return false;
-            }
-            
-                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-                RestRequest request = new RestRequest(API_URL + "transfer");
-                request.AddJsonBody(transfers);
-                IRestResponse<Transfers> response = client.Put<Transfers>(request);
-
-
-                return true;
-           
-        }
-        public List<Transfers> GetTransfer()
+       
+        public List<API_Transfer> GetTransfer()
         {
             {
                 client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
                 RestRequest request = new RestRequest(API_URL + "transfers"); 
-                IRestResponse<List<Transfers>> response = client.Get<List<Transfers>>(request);
+                IRestResponse<List<API_Transfer>> response = client.Get<List<API_Transfer>>(request);
                 if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
                 {
                     ProcessErrorResponse(response);
