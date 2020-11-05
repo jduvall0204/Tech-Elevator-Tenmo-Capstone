@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TenmoClient.Data;
 using TenmoServer.DAO;
+using TenmoServer.Models;
 
 namespace TenmoClient
 {
@@ -9,7 +10,8 @@ namespace TenmoClient
     {
         private static readonly ConsoleService consoleService = new ConsoleService();
         private static readonly AuthService authService = new AuthService();
-        
+        private static APIService apiService = new APIService();
+
         static void Main(string[] args)
         {
             Run();
@@ -32,7 +34,7 @@ namespace TenmoClient
                 {
                     while (!UserService.IsLoggedIn()) //will keep looping until user is logged in
                     {
-                        LoginUser loginUser = consoleService.PromptForLogin();
+                        Data.LoginUser loginUser = consoleService.PromptForLogin();
                         API_User user = authService.Login(loginUser);
                         if (user != null)
                         {
@@ -45,7 +47,7 @@ namespace TenmoClient
                     bool isRegistered = false;
                     while (!isRegistered) //will keep looping until user is registered
                     {
-                        LoginUser registerUser = consoleService.PromptForLogin();
+                        Data.LoginUser registerUser = consoleService.PromptForLogin();
                         isRegistered = authService.Register(registerUser);
                         if (isRegistered)
                         {
@@ -87,11 +89,19 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 1)
                 {
-                    
+
+                    decimal? balance = apiService.GetBalance();
+
+                    if (balance != null)
+                    {
+                        decimal balanceAmount = (decimal)balance;
+                        Console.WriteLine($"This is your account balance: {balanceAmount.ToString("C2")}");
+                    }
+
                 }
                 else if (menuSelection == 2)
                 {
-
+                   
                 }
                 else if (menuSelection == 3)
                 {
@@ -123,6 +133,26 @@ namespace TenmoClient
                     Environment.Exit(0);
                 }
             }
+
+        }
+        //helper methods
+       public static  int GetInteger(string message)
+        {
+            int resultValue = 0;
+            while (true)
+            {
+                Console.Write(message + " ");
+                string userInput = Console.ReadLine().Trim();
+                if (int.TryParse(userInput, out resultValue))
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("!!! Invalid input. Please enter a valid whole number.");
+                }
+            }
+            return resultValue;
         }
     }
 }

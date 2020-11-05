@@ -65,11 +65,7 @@ namespace TenmoServer.Controllers
         //    }
         //}
 
-<<<<<<< HEAD
-        //Update Recipient Balance - update Recipients(id) Current Balance
-=======
         ////Update Recipient Balance - update Recipients(id) Current Balance
->>>>>>> 18ebe21ee747383cc33377855bfc671903fd7040
         //[HttpPut("account/{id}/balance")]
         //public ActionResult<User> UpdateRecipientBalance(int id, double balance) // User should be Account
         //{
