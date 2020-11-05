@@ -6,10 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using TenmoClient.Data;
 using TenmoServer.Models;
+using NewTransfer = TenmoClient.Data.NewTransfer;
+using TransferWithDetails = TenmoClient.Data.TransferWithDetails;
 
 namespace TenmoClient
 {
-   public class APIService
+    public class APIService
     {
         private readonly string API_URL = "https://localhost:44315/";
         private readonly RestClient client = new RestClient();
@@ -19,8 +21,8 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "users");
-            IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
+            RestRequest request = new RestRequest(API_URL + "accounts/");
+            IRestResponse<API_Account> response = client.Get<API_Account>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -35,11 +37,11 @@ namespace TenmoClient
         }
         public TransferWithDetails GetTransferById(int transferId)
         {
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
             IRestRequest request = new RestRequest(API_URL + "transfer/" + transferId);
             IRestResponse<TransferWithDetails> response = client.Get<TransferWithDetails>(request);
 
-            RestRequest request = new RestRequest(API_URL + "users");
-            IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -53,15 +55,14 @@ namespace TenmoClient
         }
         public List<TransferWithDetails> GetTransferHistory()
         {
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
             IRestRequest request = new RestRequest(API_URL + "transfer/history");
             IRestResponse<List<TransferWithDetails>> response = client.Get<List<TransferWithDetails>>(request);
 
-                RestRequest request = new RestRequest(API_URL + "transfers");
-                request.AddJsonBody(transfers);
-                IRestResponse<API_Transfer> response = client.Post<API_Transfer>(request);
-              
-                 
-                return true;
+            if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
+            {
+                ProcessErrorResponse(response);
             }
             else
             {
@@ -69,8 +70,11 @@ namespace TenmoClient
             }
             return null;
         }
+
         public List<API_User> ListUsers()
         {
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
             var allUsers = new List<API_User>();
             RestRequest request = new RestRequest(API_URL + "transfer");
             IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
@@ -90,8 +94,10 @@ namespace TenmoClient
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-            RestRequest request = new RestRequest(API_URL + "accounts");
-            IRestResponse<decimal> response = client.Get<decimal>(request);
+            NewTransfer nt = new NewTransfer(receiverId, amount);
+            RestRequest request = new RestRequest(API_URL + $"transfer");
+            request.AddJsonBody(nt);
+            IRestResponse<TransferWithDetails> response = client.Post<TransferWithDetails>(request);
 
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
@@ -103,7 +109,7 @@ namespace TenmoClient
             }
             return null;
         }
-       
+
 
         private void ProcessErrorResponse(IRestResponse response)
         {
