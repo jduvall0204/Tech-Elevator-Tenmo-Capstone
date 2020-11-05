@@ -9,29 +9,7 @@ using TenmoServer.Models;
 
 namespace TenmoClient
 {
-    internal class NewBaseType
-    {
-        public List<Transfers> GetTransfer(Transfers transfers)
-        {
-            {
-                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-                RestRequest request = new RestRequest(API_URL + "transfers");
-                IRestResponse<List<Transfers>> response = client.Get<List<Transfers>>(request);
-                if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-                {
-                    ProcessErrorResponse(response);
-                }
-                else
-                {
-                    return response.Data;
-                }
-                return null;
-            }
-        }
-    }
-
-    class APIService : NewBaseType
+    class APIService
     {
         private readonly string API_URL = "https://localhost:44315/";
         private readonly RestClient client = new RestClient();
@@ -163,10 +141,31 @@ namespace TenmoClient
                 return true;
            
         }
+        public List<Transfers> GetTransfer()
         {
-     client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+            {
+                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
-    RestRequest request = new RestRequest(API_URL + "accounts/");
+                RestRequest request = new RestRequest(API_URL + "transfers"); 
+                IRestResponse<List<Transfers>> response = client.Get<List<Transfers>>(request);
+                if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
+                {
+                    ProcessErrorResponse(response);
+                }
+                else
+                {
+                    return response.Data;
+                }
+                return null;
+            }
+        }
+     
+
+        public decimal? GetBalance ()
+        {
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
+            RestRequest request = new RestRequest(API_URL + "accounts/");
             IRestResponse<decimal> response = client.Get<decimal>(request);
 
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
