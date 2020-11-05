@@ -99,7 +99,7 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 2)
                 {
-                    List<TransferWithDetails> transferHistory = apiService.GetTransferHistory();
+                    List<TransferDetails> transferHistory = apiService.GetTransferHistory();
                     var allTransferIDs = new List<int>();
                     allTransferIDs.Add(0);
                     Console.WriteLine("-------------------------------------------");
@@ -137,7 +137,7 @@ namespace TenmoClient
 
                     if (transferId != 0)
                     {
-                        TransferWithDetails transfer = apiService.GetTransferById(transferId);
+                        TransferDetails transfer = apiService.GetTransferById(transferId);
 
                         Console.WriteLine("-------------------------------------------");
                         Console.WriteLine("Transfer details");
@@ -182,7 +182,7 @@ namespace TenmoClient
                     {
                         Console.WriteLine("Enter amount to send:");
                         decimal amount = ConsoleService.GetAmount();
-                        TransferWithDetails result = apiService.SendMoney(receiverId, amount);
+                        TransferDetails result = apiService.SendMoney(receiverId, amount);
 
                         if (result != null)
                         {

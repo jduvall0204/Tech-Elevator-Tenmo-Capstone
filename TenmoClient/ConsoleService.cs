@@ -73,101 +73,85 @@ namespace TenmoClient
         }
 
 
-        //////adding methods 
+        //adding helper methods to program.cs 
 
-        public void PrintTransferDetails(Transfer transfer)
+        public static int GetNumberInList(List<int> list)
         {
+            string userInput = String.Empty;
+            int intValue = 0;
+            bool gettingNumberInList = true;
 
-        ////    Console.WriteLine("Transfer Details");
+            do
+            {
+                userInput = Console.ReadLine();
+                if (!int.TryParse(userInput, out intValue))
+                {
+                    Console.WriteLine("Invalid input format. Please try again");
+                }
+                else
+                {
+                    if (list.Contains(intValue))
+                    {
+                        gettingNumberInList = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Number you entered is not a valid ID. Try again.");
+                    }
+                }
 
+            }
+            while (gettingNumberInList);
 
-        ////    Console.WriteLine($"ID: {transfer.TransferId}");
-        ////    Console.WriteLine($"From: {transfer.AccountFrom}");
-        ////    Console.WriteLine($"To: {transfer.AccountTo}");
-        ////    Console.WriteLine($"Type: {transfer.TransferTypeId.ToString()}");
-        ////    Console.WriteLine($"Status: {transfer.TransferStatusId.ToString()}");
-        ////    Console.WriteLine($"Amount: {transfer.Amount.ToString("C2")}");
+            return intValue;
+        }
+        public static int GetNumberInRange(int min, int max)
+        {
+            string userInput = String.Empty;
+            int intValue = 0;
+            bool gettingNumberInRange = true;
 
-        ////}
-        ////public void PrintAllTransfers(List<API_Transfer> transfers)
-        ////{
+            do
+            {
+                userInput = Console.ReadLine();
+                if (!int.TryParse(userInput, out intValue))
+                {
+                    Console.WriteLine("Invalid input format. Please try again");
+                }
+                else
+                {
+                    if (min <= intValue && intValue <= max)
+                    {
+                        gettingNumberInRange = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Number you entered is not between {min} and {max}. Try again.");
+                    }
+                }
+            }
+            while (gettingNumberInRange);
 
-        ////    Console.WriteLine("Transfers");
-        ////    Console.Write("ID", ' ');
-        ////    Console.Write("From/To", ' ');
-        ////    Console.Write("Amount", ' ');
-        ////    Console.WriteLine();
+            return intValue;
+        }
+        public static decimal GetAmount()
+        {
+            string userInput = String.Empty;
+            decimal decimalValue = 0;
+            int numberOfAttempts = 0;
 
+            do
+            {
+                if (numberOfAttempts > 0)
+                {
+                    Console.WriteLine("Invalid input format. Please try again");
+                }
+                userInput = Console.ReadLine();
+                numberOfAttempts++;
+            }
+            while (!decimal.TryParse(userInput, out decimalValue));
 
-        ////    foreach (API_Transfer transfer in transfers)
-        ////    {
-        ////        string otherMessage;
-
-        ////        if (transfer.FromUserID == UserService.GetUserId()) otherMessage = $"To: {transfer.ToUserName}";
-        ////        else otherMessage = $"From: {transfer.FromUserName}";
-
-        ////        Console.Write(transfer.TransferID.ToString(), ' ');
-        ////        Console.Write(otherMessage, ' ');
-        ////        Console.Write(transfer.TransferAmount.ToString("C2"), ' ');
-        ////        Console.WriteLine();
-        ////    }
-
-        ////}
-
-        ////public API_Transfer PromptForTransferRequest(TransferType transferType)
-        ////{
-        ////    bool succeedID = false;
-        ////    bool succeedDollarAmount = false;
-        ////    var transfer = new API_Transfer();
-
-        ////    int UserIDInput = 0;
-        ////    decimal dollarAmountInput = 0;
-
-        ////    string[] userResponseArray;
-
-        ////    do
-        ////    {
-        ////        Console.WriteLine("Please enter user id and transfer amount respectively.");
-        ////        Console.WriteLine("For Example: 1 100");
-        ////        var userResponse = Console.ReadLine();
-        ////        userResponseArray = userResponse.Split(" ");
-
-        ////        if (userResponseArray.Length != 2) continue;
-
-        ////        succeedID = Int32.TryParse(userResponseArray[0], out UserIDInput);
-        ////        succeedDollarAmount = Decimal.TryParse(userResponseArray[1], out dollarAmountInput);
-        ////    }
-        ////    while (!succeedID || !succeedDollarAmount);
-
-        ////    if (transferType == TransferType.Send)
-        ////    {
-        ////        transfer.ToUserID = UserIDInput;
-        ////    }
-        ////    else { transfer.FromUserID = UserIDInput; }
-        ////    transfer.TransferAmount = dollarAmountInput;
-        ////    transfer.TransferType = transferType;
-        ////    return transfer;
-        ////}
-
-
-
-        ////public void PrintUsers(List<API_User> users)
-        ////{
-
-        ////    Console.WriteLine("Users");
-        ////    Console.Write("ID", ' ');
-        ////    Console.Write("Name", ' ');
-        ////    Console.WriteLine();
-
-
-        ////    foreach (API_User user in users)
-        ////    {
-        ////        Console.Write(user.UserId.ToString(), ' ');
-        ////        Console.Write(user.Username.ToString(), ' ');
-        ////        Console.WriteLine();
-        ////    }
-
-        ////}
+            return decimalValue;
 
 
 
@@ -177,6 +161,6 @@ namespace TenmoClient
 
 
 
-
-    }
-}
+        }
+    } 
+        }
