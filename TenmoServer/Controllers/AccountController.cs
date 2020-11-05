@@ -11,41 +11,65 @@ using TenmoServer.Security;
 
 namespace TenmoServer.Controllers
 {
-    [Route("/")]
+    [Route("[controller]")]
     [ApiController]
     [Authorize]
     public class AccountController : ControllerBase
     {
 
-        private readonly IUserDAO userDAO;
+        private readonly ITransfersDAO transfersDAO;
+        private static IAccountsDAO accountsDAO;
 
-        public AccountController(IUserDAO _userDAO)
+        public AccountController(IAccountsDAO accountsDAO, ITransfersDAO transfersDAO)
         {
-            userDAO = _userDAO;
+            this.accountsDAO = accountsDAO;
+            this.transfersDAO = transfersDAO;
         }
 
-        //Get List of all Accounts
-        [HttpGet("account")]
-        public ActionResult<List<User>> GetAccount() // User should be Account
+        [HttpGet]
+        public ActionResult<decimal> GetAccountBalance()
         {
-            return Ok(userDAO.GetUsers());
-        }
-        // Get Account with ID from List
-        [HttpGet("account/{id}")]
-        public ActionResult<User> GetAccountId(string username) // User should be Account
-        {
-            User user = userDAO.GetUser(username);
-            if (user != null)
+            string userIDString = (User.FindFirst("sub")?.Value);
+            int userId;
+            bool successfulParse = Int32.TryParse(userIDString, out userId);
+            if(!successfulParse)
             {
-                return Ok(user);
+                return StatusCode(500);
             }
-            else
+            decimal? balance = accountsDAO.GetBalance(userId);
+
+            if(balance == null)
             {
                 return NotFound();
             }
+            return Ok(balance);
         }
+        ////Get List of all Accounts
+        //[HttpGet("account")]
+        //public ActionResult<List<User>> GetAccount() // User should be Account
+        //{
+        //    return Ok(userDAO.GetUsers());
+        //}
+        //// Get Account with ID from List
+        //[HttpGet("account/{id}")]
+        //public ActionResult<User> GetAccountId(string username) // User should be Account
+        //{
+        //    User user = userDAO.GetUser(username);
+        //    if (user != null)
+        //    {
+        //        return Ok(user);
+        //    }
+        //    else
+        //    {
+        //        return NotFound();
+        //    }
+        //}
 
+<<<<<<< HEAD
         //Update Recipient Balance - update Recipients(id) Current Balance
+=======
+        ////Update Recipient Balance - update Recipients(id) Current Balance
+>>>>>>> 18ebe21ee747383cc33377855bfc671903fd7040
         //[HttpPut("account/{id}/balance")]
         //public ActionResult<User> UpdateRecipientBalance(int id, double balance) // User should be Account
         //{
