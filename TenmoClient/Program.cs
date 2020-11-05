@@ -84,74 +84,129 @@ namespace TenmoClient
                 Console.WriteLine("---------");
                 Console.Write("Please choose an option: ");
 
-                if (!int.TryParse(Console.ReadLine(), out menuSelection))
-                {
-                    Console.WriteLine("Invalid input. Please enter only a number.");
-                }
-                else if (menuSelection == 1)
-                {
+                menuSelection = ConsoleService.GetNumberInRange(0, 6);
 
-                    decimal? balance = apiService.GetBalance();
-
-                    if (balance != null)
+                 if (menuSelection == 1) 
+                {
                     {
-                        decimal balanceAmount = (decimal)balance;
-                        Console.WriteLine($"This is your account balance: {balanceAmount.ToString("C2")}");
-                    }
+                        API_Account account = apiService.GetAccounts();
+                        if (account != null)
+                        {
+                            Console.WriteLine($"Your current account balance is: {account.Balance.ToString("C2")}");
+                        }
 
+                    }
                 }
                 else if (menuSelection == 2)
                 {
-                    List<API_Transfer> transfers = apiService.GetTransfer();
-                    if (transfers == null) continue;
-
-                    consoleService.PrintAllTransfers(transfers);
-
-                    int chosenID = consoleService.PromptForTransferID("get details");
-
-                    Func<API_Transfer, bool> search = t => t.TransferID == chosenID;
-
-
-                    //if (transfers.Any(search))
-                    //{
-                    //    API_Transfer transfer = transfers.Single(search);
-
-                    //    consoleService.PrintTransferDetails(transfer);
-                    //}
-                    if (chosenID != 0)
+                    List<TransferWithDetails> transferHistory = apiService.GetTransferHistory();
+                    var allTransferIDs = new List<int>();
+                    allTransferIDs.Add(0);
+                    Console.WriteLine("-------------------------------------------");
+                    Console.WriteLine("Transfer IDs         From/To         Amount");
+                    Console.WriteLine("-------------------------------------------");
+                    foreach (var item in transferHistory)
                     {
-                        Console.WriteLine("The transfer ID you requested does not exist.");
+                        if (item.TransferId < 10)
+                        {
+                            if (item.FromUser == UserService.GetUsername())
+                            {
+                                Console.WriteLine($"0{item.TransferId}              To: {item.ToUser}             {item.Amount}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"0{item.TransferId}              From: {item.FromUser}             {item.Amount}");
+                            }
+                        }
+                        else
+                        {
+                            if (item.FromUser == UserService.GetUsername())
+                            {
+                                Console.WriteLine($"{item.TransferId}              To: {item.ToUser}             {item.Amount}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{item.TransferId}              From: {item.FromUser}             {item.Amount}");
+                            }
+                        }
+                        allTransferIDs.Add(item.TransferId);
+                    }
+                    Console.WriteLine("-------------------------------------------");
+                    Console.WriteLine("Please enter transfer ID to view details (0 to cancel):");
+                    int transferId =ConsoleService.GetNumberInList(allTransferIDs);
+
+                    if (transferId != 0)
+                    {
+                        TransferWithDetails transfer = apiService.GetTransferById(transferId);
+
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine("Transfer details");
+                        Console.WriteLine("-------------------------------------------");
+                        Console.WriteLine($"ID: {transfer.TransferId}");
+                        Console.WriteLine($"From: {transfer.FromUser}");
+                        Console.WriteLine($"To: {transfer.ToUser}");
+                        Console.WriteLine($"Type: {transfer.TransferType}");
+                        Console.WriteLine($"Status: {transfer.TransferStatus}");
+                        Console.WriteLine($"Amount: {transfer.Amount}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Returning to the main menu.");
                     }
                 }
 
                 else if (menuSelection == 3)
                 {
-
+                    Console.WriteLine("Feature unavailable. Returning to main menu.");
                 }
                 else if (menuSelection == 4)
                 {
-                    List<API_User> users = apiService.GetOtherAccounts();
-                    if (users == null) continue;
+                    List<API_User> users = apiService.ListUsers();
+                    var allUserIDs = new List<int>();
+                    int currentUserId = UserService.GetUserId();
+                    users.RemoveAt(currentUserId - 1);
 
-                    consoleService.PrintUsers(users);
-                    TransferType transferType = TransferType.Send;
-                    API_Transfer transfer = consoleService.PromptForTransferRequest(transferType);
-
-                    if (!users.Any(u => u.UserId == transfer.ToUserID))
+                    Console.WriteLine("-------------------------------------------");
+                    Console.WriteLine("User IDs     Names");
+                    Console.WriteLine("-------------------------------------------");
+                    foreach (var item in users)
                     {
-                        Console.WriteLine("The user ID you requested does not exist.");
-                        continue;
+                        Console.WriteLine($"{item.UserId}           {item.Username}");
+                        allUserIDs.Add(item.UserId);
                     }
+                    Console.WriteLine("-------------------------------------------");
+                    Console.WriteLine("Enter the ID of user you are sending to (0 to cancel):");
+                    int receiverId = ConsoleService.GetNumberInList(allUserIDs);
 
-                    transfer.ToUserName = users.First(u => u.UserId == transfer.ToUserID)?.Username;
-                    apiService.SubmitTransfer(transfer);
+                    if (receiverId != 0)
+                    {
+                        Console.WriteLine("Enter amount to send:");
+                        decimal amount = ConsoleService.GetAmount();
+                        TransferWithDetails result = apiService.SendMoney(receiverId, amount);
 
-                    
-
+                        if (result != null)
+                        {
+                            Console.WriteLine("Transfer successful! :)");
+                            Console.WriteLine("-------------------------------------------");
+                            Console.WriteLine("Transfer Details");
+                            Console.WriteLine("-------------------------------------------");
+                            Console.WriteLine($"ID: {result.TransferId}");
+                            Console.WriteLine($"From: {result.FromUser}");
+                            Console.WriteLine($"To: {result.ToUser}");
+                            Console.WriteLine($"Type: {result.TransferType}");
+                            Console.WriteLine($"Status: {result.TransferStatus}");
+                            Console.WriteLine($"Amount: {result.Amount}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Transfer not completed");
+                        }
+                    }
                 }
+
                 else if (menuSelection == 5)
                 {
-
+                    Console.WriteLine("Feature unavailable. Returning to main menu.");
                 }
                 else if (menuSelection == 6)
                 {
@@ -167,5 +222,8 @@ namespace TenmoClient
             }
 
         }
+
+
+       
     }
 }
