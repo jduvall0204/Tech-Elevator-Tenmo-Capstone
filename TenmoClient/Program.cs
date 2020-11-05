@@ -89,6 +89,7 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 1)
                 {
+
                     decimal? balance = apiService.GetBalance();
 
                     if (balance != null)
@@ -96,6 +97,7 @@ namespace TenmoClient
                         decimal balanceAmount = (decimal)balance;
                         Console.WriteLine($"This is your account balance: {balanceAmount.ToString("C2")}");
                     }
+
                 }
                 else if (menuSelection == 2)
                 {

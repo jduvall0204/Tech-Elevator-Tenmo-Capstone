@@ -141,14 +141,14 @@ namespace TenmoServer.DAO
 
         public User Update(int id, User updated) // User should be Account 
         {
-            User old = User.Find(a => a.Id == id);
-            if (old != null)
-            {
-                updated.Id = old.Id;
-                Balance.Remove(old);
-                Balance.Add(updated);
-                return updated;
-            }
+            //User old = User.Find(a => a.Id == id);
+            //if (old != null)
+            //{
+            //    updated.Id = old.Id;
+            //    Balance.Remove(old);
+            //    Balance.Add(updated);
+            //    return updated;
+            //}
             return null;
         }
 
