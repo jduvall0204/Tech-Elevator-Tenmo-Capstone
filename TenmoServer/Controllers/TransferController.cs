@@ -17,7 +17,7 @@ namespace TenmoServer.Controllers
         private readonly IAccountsDAO accountsDAO;
         private readonly ITransfersDAO transfersDAO;
 
-        public TransferControler(IAccountsDAO accountsDAO, ITransfersDAO transfersDAO)
+        public TransferController(IAccountsDAO accountsDAO, ITransfersDAO transfersDAO)
         {
             this.accountsDAO = accountsDAO;
             this.transfersDAO = transfersDAO;

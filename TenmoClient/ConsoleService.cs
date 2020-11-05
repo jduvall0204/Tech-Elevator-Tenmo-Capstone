@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using TenmoClient.Data;
+using TenmoServer.Models;
 
 namespace TenmoClient
 {
@@ -26,13 +27,13 @@ namespace TenmoClient
             }
         }
 
-        public LoginUser PromptForLogin()
+        public Data.LoginUser PromptForLogin()
         {
             Console.Write("Username: ");
             string username = Console.ReadLine();
             string password = GetPasswordFromConsole("Password: ");
 
-            LoginUser loginUser = new LoginUser
+            Data.LoginUser loginUser = new Data.LoginUser
             {
                 Username = username,
                 Password = password
@@ -70,5 +71,111 @@ namespace TenmoClient
             Console.WriteLine("");
             return pass;
         }
+
+
+        //adding methods 
+
+        public void PrintTransferDetails(Transfers transfer)
+        {
+
+            Console.WriteLine("Transfer Details");
+
+
+            Console.WriteLine($"ID: {transfer.TransferId}");
+            Console.WriteLine($"From: {transfer.AccountFrom}");
+            Console.WriteLine($"To: {transfer.AccountTo}");
+            Console.WriteLine($"Type: {transfer.TransferTypeId.ToString()}");
+            Console.WriteLine($"Status: {transfer.TransferStatusId.ToString()}");
+            Console.WriteLine($"Amount: {transfer.Amount.ToString("C2")}");
+
+        }
+        public void PrintAllTransfers(List<Transfers> transfers)
+        {
+
+            Console.WriteLine("Transfers");
+            Console.Write("ID", ' ');
+            Console.Write("From/To", ' ');
+            Console.Write("Amount", ' ');
+            Console.WriteLine();
+
+
+            foreach (Transfers transfer in transfers)
+            {
+                string otherMessage;
+
+                if (transfer.AccountFrom == UserService.GetUserId()) otherMessage = $"To: {transfer.AccountTo}";
+                else otherMessage = $"From: {transfer.AccountFrom}";
+
+                Console.Write(transfer.TransferId.ToString(), ' ');
+                Console.Write(otherMessage,( ' '));
+                Console.Write(transfer.Amount.ToString("C2"), ' ');
+                Console.WriteLine();
+            }
+
+        }
+
+        public API_Transfer PromptForTransferRequest(TransferType transferType)
+        {
+            bool succeedID = false;
+            bool succeedDollarAmount = false;
+            var transfer = new API_Transfer();
+
+            int UserIDInput = 0;
+            decimal dollarAmountInput = 0;
+
+            string[] userResponseArray;
+
+            do
+            {
+                Console.WriteLine("Please enter user id and transfer amount respectively.");
+                Console.WriteLine("For Example: 1 100");
+                var userResponse = Console.ReadLine();
+                userResponseArray = userResponse.Split(" ");
+
+                if (userResponseArray.Length != 2) continue;
+
+                succeedID = Int32.TryParse(userResponseArray[0], out UserIDInput);
+                succeedDollarAmount = Decimal.TryParse(userResponseArray[1], out dollarAmountInput);
+            }
+            while (!succeedID || !succeedDollarAmount);
+
+            if (transferType == TransferType.Send)
+            {
+                transfer.ToUserID = UserIDInput;
+            }
+            else { transfer.FromUserID = UserIDInput; }
+            transfer.TransferAmount = dollarAmountInput;
+            transfer.TransferType = transferType;
+            return transfer;
+        }
+
+
+        public void PrintUsers(List<API_User> users)
+        {
+
+            Console.WriteLine("Users");
+            Console.Write("ID", ' ');
+            Console.Write("Name", ' ');
+            Console.WriteLine();
+
+
+            foreach (API_User user in users)
+            {
+                Console.Write(user.UserId.ToString(), ' ');
+                Console.Write(user.Username.ToString(), ' ');
+                Console.WriteLine();
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
     }
 }
