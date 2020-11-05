@@ -1,4 +1,5 @@
 ﻿using RestSharp;
+using RestSharp.Authenticators;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -24,11 +25,13 @@ namespace TenmoClient
         //}
 
 
-        //do we need account here and not user??
-        public List<User>  GetAccounts(int userId)
-        {//what to add with url? and what list are we looking for account?
-            RestRequest request = new RestRequest(API_URL + "accounts/" + userId);
-            IRestResponse<List<User>> response = client.Get<List<User>>(request);
+        public List<Accounts>  GetAccounts(int accountId)
+        {
+            //what to add with url? and what list are we looking for account?
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
+            RestRequest request = new RestRequest(API_URL + "accounts/" + accountId );
+            IRestResponse<List<Accounts>> response = client.Get<List<Accounts>>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -41,14 +44,14 @@ namespace TenmoClient
 
 
         }
-        //userId add ???
-        public User UpdateRecipientBalance(User balance, int userId)
+        public Accounts UpdateRecipientBalance(User balance, int userId)
         {
             //int result = balance? return result? 
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
             RestRequest request = new RestRequest(API_URL + "accounts/" + balance + userId);
             request.AddJsonBody(balance);
-            IRestResponse<User> response = client.Put<User>(request);
+            IRestResponse<Accounts> response = client.Put<Accounts>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -59,14 +62,14 @@ namespace TenmoClient
             }
                 return null;
         }
-        //userId add ???
-        public User UpdateSenderBalance(User balance, int userId)
+        public Accounts UpdateSenderBalance(User balance, int userId)
         {
             //int result = balance? return result? 
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
             RestRequest request = new RestRequest(API_URL + "accounts/" + balance + userId);
             request.AddJsonBody(balance);
-            IRestResponse<User> response = client.Put<User>(request);
+            IRestResponse<Accounts> response = client.Put<Accounts>(request);
             if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
             {
                 ProcessErrorResponse(response);
@@ -79,7 +82,8 @@ namespace TenmoClient
         }
         public User Send(string userName, int userId)
         {
-            //balance at all? 
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
             RestRequest request = new RestRequest(API_URL + "users/" + userName + userId);
             request.AddJsonBody(userId);
             IRestResponse<User> response = client.Put<User>(request);
@@ -93,11 +97,14 @@ namespace TenmoClient
             }
             return null;
         }
-        public User GetTransfer(int transferId, int accountId)
-        {//list of transfers? 
-            { 
-                RestRequest request = new RestRequest(API_URL + "transfers/" + transferId + accountId);
-                IRestResponse<User> response = client.Get<User>(request);
+        public Transfers GetTransfer(int transferId)//, int accountFrom, int accountTo)
+        {
+            //list of transfers? 
+            {
+                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
+                RestRequest request = new RestRequest(API_URL + "transfers/" + transferId); //+ accountFrom + accountTo);
+                IRestResponse<Transfers> response = client.Get<Transfers>(request);
                 if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
                 {
                     ProcessErrorResponse(response);
@@ -108,6 +115,26 @@ namespace TenmoClient
                 }
                 return null;
             }
+        }
+
+        public Accounts GetBalance (int balance, int userId)
+        {
+
+            //userId
+            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+
+            RestRequest request = new RestRequest(API_URL + "accounts/" + balance);
+            IRestResponse<Accounts> response = client.Get<Accounts>(request);
+
+            if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
+            {
+                ProcessErrorResponse(response);
+            }
+            else
+            {
+                return response.Data;
+            }
+            return null;
         }
 
         //do we want error messages like in the examples? 
