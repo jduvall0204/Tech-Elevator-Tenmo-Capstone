@@ -5,14 +5,13 @@ using TenmoServer.Models;
 using TenmoServer.Security;
 using TenmoServer.Security.Models;
 
-
 namespace TenmoServer.DAO
 {
     public class UserSqlDAO : IUserDAO
     {
         private readonly string connectionString;
         const decimal startingBalance = 1000;
-        private static List<User> Balance { get; set; }
+
         public UserSqlDAO(string dbConnectionString)
         {
             connectionString = dbConnectionString;
@@ -40,7 +39,7 @@ namespace TenmoServer.DAO
             }
             catch (SqlException)
             {
-                throw;
+                Console.WriteLine("There was a problem with the database connection.");
             }
 
             return returnUser;
@@ -63,8 +62,8 @@ namespace TenmoServer.DAO
                     {
                         while (reader.Read())
                         {
-                            User u = GetUserFromReader(reader);
-                            returnUsers.Add(u);
+                            User user = GetUserFromReader(reader);
+                            returnUsers.Add(user);
                         }
 
                     }
@@ -112,13 +111,9 @@ namespace TenmoServer.DAO
             return GetUser(username);
         }
 
-       
-
-      
-
         private User GetUserFromReader(SqlDataReader reader)
         {
-            User u = new User()
+            User user = new User()
             {
                 UserId = Convert.ToInt32(reader["user_id"]),
                 Username = Convert.ToString(reader["username"]),
@@ -126,7 +121,7 @@ namespace TenmoServer.DAO
                 Salt = Convert.ToString(reader["salt"]),
             };
 
-            return u;
+            return user;
         }
 
         public User GetBalance(double amount)
