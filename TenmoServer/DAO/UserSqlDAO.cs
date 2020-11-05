@@ -11,7 +11,7 @@ namespace TenmoServer.DAO
     {
         private readonly string connectionString;
         const decimal startingBalance = 1000;
-        private static List<User> Auctions { get; set; }
+        private static List<User> Balance { get; set; }
         public UserSqlDAO(string dbConnectionString)
         {
             connectionString = dbConnectionString;
@@ -139,14 +139,14 @@ namespace TenmoServer.DAO
             return returnUser;
         }
 
-        public User Update(int id, User updated)
+        public User Update(int id, User updated) // User should be Account 
         {
             User old = User.Find(a => a.Id == id);
             if (old != null)
             {
                 updated.Id = old.Id;
-                Auctions.Remove(old);
-                Auctions.Add(updated);
+                Balance.Remove(old);
+                Balance.Add(updated);
                 return updated;
             }
             return null;

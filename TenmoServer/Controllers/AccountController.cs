@@ -52,7 +52,7 @@ namespace TenmoServer.Controllers
             User recipientBalance = userDAO.GetBalance(id);
             if (recipientBalance == null)
             {
-                return NotFound("Balance does not exist");
+                return NotFound("Balance does not exist"); //sql command existing balance that belongs to user ID, take that 
             }
 
             User result = userDAO.Update(id, balance);
@@ -74,14 +74,14 @@ namespace TenmoServer.Controllers
         }
         //Get list of all transfers
         [HttpGet("account/transfers")]
-        public ActionResult<List<Transfers>> GetAllTransfers() // User should be Account
+        public ActionResult<List<Transfers>> GetTransfers() // User should be Transfer
         {
             return Ok(userDAO.GetTransfers());
         }
 
         //Get Transfer with Id from List - Past Transfer
         [HttpGet("account/{id}/transfers")]
-        public ActionResult<List<Transfers>> GetAllTransfers(int Id) // User should be Account
+        public ActionResult<List<Transfers>> GetTransfers(int Id) // User should be Transfer
         {
             return Ok(userDAO.GetTransfers(Id));
         }
