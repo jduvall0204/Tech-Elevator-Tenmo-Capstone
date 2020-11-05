@@ -5,6 +5,7 @@ using TenmoServer.Models;
 using TenmoServer.Security;
 using TenmoServer.Security.Models;
 
+
 namespace TenmoServer.DAO
 {
     public class UserSqlDAO : IUserDAO
@@ -111,46 +112,9 @@ namespace TenmoServer.DAO
             return GetUser(username);
         }
 
-        public User GetBalance(double amount)
-        {
-            User returnUser = null;
+       
 
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT user_id, username, password_hash, salt FROM users WHERE username = @username", conn);
-                    cmd.Parameters.AddWithValue("@username", amount);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.HasRows && reader.Read())
-                    {
-                        returnUser = GetUserFromReader(reader);
-                    }
-                }
-            }
-            catch (SqlException)
-            {
-                throw;
-            }
-
-            return returnUser;
-        }
-
-        public User Update(int id, User updated) // User should be Account 
-        {
-            User old = User.Find(a => a.Id == id);
-            if (old != null)
-            {
-                updated.Id = old.Id;
-                Balance.Remove(old);
-                Balance.Add(updated);
-                return updated;
-            }
-            return null;
-        }
+      
 
         private User GetUserFromReader(SqlDataReader reader)
         {
