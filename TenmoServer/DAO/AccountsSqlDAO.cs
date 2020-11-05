@@ -8,14 +8,10 @@ using TenmoServer.Controllers;
 
 namespace TenmoServer.DAO
 {
-<<<<<<< HEAD
-    public class AccountsSqlDAO: IAccountsDAO
-=======
-    public class AccountsSqlDAO : IAccountsDAO
->>>>>>> 18ebe21ee747383cc33377855bfc671903fd7040
-    {
 
-        private string connectionString;
+    public class AccountsSqlDAO : IAccountsDAO
+    {
+        private readonly string connectionString;
 
         public AccountsSqlDAO(string dbConnectionString)
         {
@@ -24,6 +20,7 @@ namespace TenmoServer.DAO
         public Accounts GetAccounts(string username)
         {
             Accounts getAccount = null;
+
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
@@ -47,7 +44,6 @@ namespace TenmoServer.DAO
             }
             return getAccount;
         }
-
         public decimal? GetBalance(int userID)
         {
             Accounts getBalance = null;
@@ -74,19 +70,18 @@ namespace TenmoServer.DAO
             }
             return getBalance.Balance;
         }
-
         public bool GetTransfer(Transfers transfer)
         {
-            if(!UpdateBalance(transfer.ToUserId, transfer.TransferAmount))
+            if(!UpdateBalance(transfer.AccountTo, transfer.Amount))
             {
                 return false;
             }
-            if (!UpdateBalance(transfer.FromUserId, - transfer.TransferAmount))
+            if (!UpdateBalance(transfer.AccountFrom, - transfer.Amount))
             {
-                return true;
+                return false;
             }
+            return true;
         }
-
         public bool UpdateBalance(int userId, decimal amount)
         {
             try
@@ -99,9 +94,9 @@ namespace TenmoServer.DAO
                     cmd.Parameters.AddWithValue("@amount", amount);
                     cmd.Parameters.AddWithValue("@user_id", userId);
 
-                    int rowsAffected = cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
 
-                    return (rowsAffected > 0);
+                    return true;
                 }
             }
             catch (Exception e)
