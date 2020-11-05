@@ -15,7 +15,7 @@ namespace TenmoClient
         private readonly RestClient client = new RestClient();
 
 
-        public List<API_User>  GetAccounts()
+        public API_Account GetAccounts()
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
@@ -33,9 +33,10 @@ namespace TenmoClient
 
 
         }
-        public List<API_User> GetOtherAccounts()
+        public TransferWithDetails GetTransferById(int transferId)
         {
-            client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+            IRestRequest request = new RestRequest(API_URL + "transfer/" + transferId);
+            IRestResponse<TransferWithDetails> response = client.Get<TransferWithDetails>(request);
 
             RestRequest request = new RestRequest(API_URL + "users");
             IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
@@ -47,13 +48,13 @@ namespace TenmoClient
             {
                 return response.Data;
             }
+
             return null;
         }
-
-        public bool SubmitTransfer(API_Transfer transfers)
+        public List<TransferWithDetails> GetTransferHistory()
         {
-            {
-                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
+            IRestRequest request = new RestRequest(API_URL + "transfer/history");
+            IRestResponse<List<TransferWithDetails>> response = client.Get<List<TransferWithDetails>>(request);
 
                 RestRequest request = new RestRequest(API_URL + "transfers");
                 request.AddJsonBody(transfers);
@@ -62,29 +63,30 @@ namespace TenmoClient
                  
                 return true;
             }
-        }
-       
-        public List<API_Transfer> GetTransfer()
-        {
+            else
             {
-                client.Authenticator = new JwtAuthenticator(UserService.GetToken());
-
-                RestRequest request = new RestRequest(API_URL + "transfers"); 
-                IRestResponse<List<API_Transfer>> response = client.Get<List<API_Transfer>>(request);
-                if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
-                {
-                    ProcessErrorResponse(response);
-                }
-                else
-                {
-                    return response.Data;
-                }
-                return null;
+                return response.Data;
             }
+            return null;
         }
-     
+        public List<API_User> ListUsers()
+        {
+            var allUsers = new List<API_User>();
+            RestRequest request = new RestRequest(API_URL + "transfer");
+            IRestResponse<List<API_User>> response = client.Get<List<API_User>>(request);
+            allUsers = response.Data;
 
-        public decimal? GetBalance ()
+            if (response.ResponseStatus != ResponseStatus.Completed || !response.IsSuccessful)
+            {
+                ProcessErrorResponse(response);
+            }
+            else
+            {
+                return allUsers;
+            }
+            return null;
+        }
+        public TransferWithDetails SendMoney(int receiverId, decimal amount)
         {
             client.Authenticator = new JwtAuthenticator(UserService.GetToken());
 
@@ -101,6 +103,7 @@ namespace TenmoClient
             }
             return null;
         }
+       
 
         private void ProcessErrorResponse(IRestResponse response)
         {
