@@ -89,7 +89,7 @@ namespace TenmoClient
             Console.WriteLine($"Amount: {transfer.Amount.ToString("C2")}");
 
         }
-        public void PrintAllTransfers(List<Transfers> transfers)
+        public void PrintAllTransfers(List<API_Transfer> transfers)
         {
 
             Console.WriteLine("Transfers");
@@ -99,16 +99,16 @@ namespace TenmoClient
             Console.WriteLine();
 
 
-            foreach (Transfers transfer in transfers)
+            foreach (API_Transfer transfer in transfers)
             {
                 string otherMessage;
 
-                if (transfer.AccountFrom == UserService.GetUserId()) otherMessage = $"To: {transfer.AccountTo}";
-                else otherMessage = $"From: {transfer.AccountFrom}";
+                if (transfer.FromUserID == UserService.GetUserId()) otherMessage = $"To: {transfer.ToUserName}";
+                else otherMessage = $"From: {transfer.FromUserName}";
 
-                Console.Write(transfer.TransferId.ToString(), ' ');
-                Console.Write(otherMessage,( ' '));
-                Console.Write(transfer.Amount.ToString("C2"), ' ');
+                Console.Write(transfer.TransferID.ToString(), ' ');
+                Console.Write(otherMessage, ' ');
+                Console.Write(transfer.TransferAmount.ToString("C2"), ' ');
                 Console.WriteLine();
             }
 
@@ -148,6 +148,7 @@ namespace TenmoClient
             transfer.TransferType = transferType;
             return transfer;
         }
+
 
 
         public void PrintUsers(List<API_User> users)

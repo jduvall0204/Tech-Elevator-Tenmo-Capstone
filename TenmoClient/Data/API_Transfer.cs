@@ -4,7 +4,28 @@ using System.Text;
 
 namespace TenmoClient.Data
 {
-    class API_Transfer
+    public class API_Transfer
     {
+         
+        public int FromUserID { get; set; }
+        public int ToUserID { get; set; }
+        public decimal TransferAmount { get; set; }
+        public TransferType TransferType { get; set; }
+        public TransferStatus TransferStatus { get; set; } = TransferStatus.Approved;
+        public string FromUserName { get; set; }
+        public string ToUserName { get; set; }
+        public int TransferID { get; set; }
     }
+
+    public enum TransferType
+    {
+        Request, Send
+    }
+
+    public enum TransferStatus
+    {
+        Approved
+    }
+
 }
+
