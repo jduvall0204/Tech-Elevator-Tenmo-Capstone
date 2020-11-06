@@ -15,27 +15,27 @@ namespace TenmoServer.Controllers
     [ApiController]
     public class TransferController : ControllerBase
     {
-        private readonly ITransfersDAO transferDAO;
-        private readonly IAccountsDAO accountDAO;
-        private readonly IUserDAO userDAO;
+        private readonly ITransfersDAO TransfersSqlDAO;
+        private readonly IAccountsDAO AccountsSqlDAO;
+        private readonly IUserDAO UserSqlDAO;
 
-        public TransferController(ITransfersDAO transferDAO, IAccountsDAO accountDAO, IUserDAO userDAO)
+        public TransferController(ITransfersDAO _transferDAO, IAccountsDAO _accountDAO, IUserDAO _userDAO)
         {
-            this.transferDAO = transferDAO;
-            this.accountDAO = accountDAO;
-            this.userDAO = userDAO;
+            TransfersSqlDAO = _transferDAO;
+            AccountsSqlDAO = _accountDAO;
+            UserSqlDAO = _userDAO;
         }
 
         [HttpGet]
         public List<User> ListUsers()
         {
-            return userDAO.GetUsers();
+            return UserSqlDAO.GetUsers();
         }
 
         [HttpGet("{transferId}")]
         public ActionResult<TransferWithDetails> GetTransferById(int transferId)
         {
-            TransferWithDetails transfer = transferDAO.GetTransfer(transferId);
+            TransferWithDetails transfer = TransfersSqlDAO.GetTransfer(transferId);
             if (transfer != null)
             {
                 return Ok(transfer);
@@ -50,7 +50,7 @@ namespace TenmoServer.Controllers
         public ActionResult<List<TransferWithDetails>> ListTransfers()
         {
             int userId = GetId();
-            var transferHistory = transferDAO.GetTransferHistory(userId);
+            var transferHistory = TransfersSqlDAO.GetTransferHistory(userId);
 
             if (transferHistory != null)
             {
@@ -65,7 +65,7 @@ namespace TenmoServer.Controllers
         public ActionResult<TransferWithDetails> SendMoney(NewTransfer newTransfer)
         {
             int userId = GetId();
-            Account accountFrom = accountDAO.GetAccounts(userId);
+            Account accountFrom = AccountsSqlDAO.GetAccount(userId);
 
             if (accountFrom == null)
             {
@@ -73,7 +73,7 @@ namespace TenmoServer.Controllers
             }
             if (accountFrom.Balance >= newTransfer.Amount)
             {
-                TransferWithDetails result = transferDAO.SendMoney(userId, newTransfer.ReceiverAccount, newTransfer.Amount);
+                TransferWithDetails result = TransfersSqlDAO.SendMoney(userId, newTransfer.ReceiverAccount, newTransfer.Amount);
 
                 return Ok(result);
             }

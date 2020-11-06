@@ -45,10 +45,40 @@ namespace TenmoServer.DAO
             return account;
         }
 
-        public Account GetAccounts(int id)
+        public decimal GetBalance(int userID)
         {
-            throw new NotImplementedException();
+            Account account = new Account();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("SELECT balance FROM accounts JOIN users ON users.user_id = accounts.account_id WHERE users.user_id = @user_id", conn);
+                    cmd.Parameters.AddWithValue("@user_id", userID);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            account.Balance = Convert.ToDecimal(reader["balance"]);
+                        }
+                    }
+
+                }
+            }
+            catch (SqlException)
+            {
+                throw;
+            }
+            return account.Balance;
         }
+        //public Account GetAccounts(int id)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         private Account GetAccountFromReader(SqlDataReader reader) // making the data into an account object 
         {
