@@ -13,12 +13,14 @@ namespace TenmoServer.Controllers
     
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class TransferController : ControllerBase
     {
-        private readonly ITransfersDAO TransfersSqlDAO;
-        private readonly IAccountsDAO AccountsSqlDAO;
-        private readonly IUserDAO UserSqlDAO;
+        private static ITransfersDAO TransfersSqlDAO;
+        private static IAccountsDAO AccountsSqlDAO;
+        private static IUserDAO UserSqlDAO;
 
+        
         public TransferController(ITransfersDAO _transferDAO, IAccountsDAO _accountDAO, IUserDAO _userDAO)
         {
             TransfersSqlDAO = _transferDAO;
@@ -26,70 +28,52 @@ namespace TenmoServer.Controllers
             UserSqlDAO = _userDAO;
         }
 
-        [HttpGet]
-        public List<User> ListUsers()
+        [HttpPost]
+        public ActionResult<Transfer> InsertTransfer(Transfer transferToInsert)
         {
-            return UserSqlDAO.GetUsers();
-        }
-
-        [HttpGet("{transferId}")]
-        public ActionResult<TransferWithDetails> GetTransferById(int transferId)
-        {
-            TransferWithDetails transfer = TransfersSqlDAO.GetTransfer(transferId);
+            Transfer transfer = TransfersSqlDAO.InsertTransfer(transferToInsert);
             if (transfer != null)
             {
                 return Ok(transfer);
             }
-            else
-            {
-                return NotFound("Transfer does not exist.");
-            }
+            else return NotFound();
+
         }
 
-        [HttpGet("history")]
-        public ActionResult<List<TransferWithDetails>> ListTransfers()
+        [HttpGet]
+        public List<Transfer> ListTransfers()
         {
-            int userId = GetId();
-            var transferHistory = TransfersSqlDAO.GetTransferHistory(userId);
+            return TransfersSqlDAO.ListTransfers();
+        }
 
-            if (transferHistory != null)
+        [HttpGet("{id}")]
+        public ActionResult<Transfer> GetTransfer(int id)
+        {
+            Transfer transfer = TransfersSqlDAO.GetTransfer(id);
+            if (transfer != null)
             {
-                return Ok(transferHistory);
+                return Ok(transfer);
             }
-            else
+            else return NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult<Transfer> UpdateBalance(Transfer transfer)
+        {
+            if (transfer == null)
             {
                 return NotFound();
             }
-        }
-        [HttpPost]
-        public ActionResult<TransferWithDetails> SendMoney(NewTransfer newTransfer)
-        {
-            int userId = GetId();
-            Account accountFrom = AccountsSqlDAO.GetAccount(userId);
-
-            if (accountFrom == null)
+            Transfer verifiedTransfer = TransfersSqlDAO.GetTransfer(transfer.TransferID);
+            if (verifiedTransfer.TransferStatusID == 2) //approved status ID
             {
-                return NotFound("Account does not exist");
+                TransfersSqlDAO.UpdateBalance(verifiedTransfer);
+                return Ok(transfer);
             }
-            if (accountFrom.Balance >= newTransfer.Amount)
-            {
-                TransferWithDetails result = TransfersSqlDAO.SendMoney(userId, newTransfer.ReceiverAccount, newTransfer.Amount);
+            else return BadRequest();
 
-                return Ok(result);
-            }
-            else
-            {
-                return NotFound();
-            }
         }
-        public int GetId()
-        {
-            int userId = 0;
-            var tokenId = User.FindFirst("sub").Value;
 
-            int.TryParse(tokenId, out userId);
-
-            return userId;
-        }
+       
     }
 }

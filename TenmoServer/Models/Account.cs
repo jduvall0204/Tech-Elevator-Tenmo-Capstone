@@ -8,16 +8,16 @@ namespace TenmoServer.Models
 {
     public class Account
     {
-        public int AccountId { get; set; }
+        public int accountId { get; set; }
         [Required(ErrorMessage = "You need to enter the account ID.")]
-        public int UserId { get; set; }
-        public decimal Balance { get; set; }
+        public int userId { get; set; }
+        public decimal balance { get; set; }
 
 
         
     }
     public class AccountUserName
     {
-        public string Username { get; set; }
+        public string username { get; set; }
     }
 }

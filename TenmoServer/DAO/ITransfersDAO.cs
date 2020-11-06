@@ -8,9 +8,14 @@ namespace TenmoServer.DAO
 {
     public interface ITransfersDAO
     {
-        TransferWithDetails SendMoney(int senderId, int receiverId, decimal amount);
-        List<TransferWithDetails> GetTransferHistory(int userId);
-        TransferWithDetails GetTransfer(int transferId);
+        Transfer InsertTransfer(Transfer transfer);
+
+        List<Transfer> ListTransfers();
+
+        Transfer GetTransfer(int id);
+
+        Transfer UpdateBalance(Transfer transfer);
+       
 
     }
 }
