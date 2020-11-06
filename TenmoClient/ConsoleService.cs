@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TenmoClient.Data;
 using TenmoServer.Models;
 
@@ -154,13 +155,89 @@ namespace TenmoClient
             return decimalValue;
 
 
-
-
-
-
-
-
-
         }
-    } 
+
+
+
+        public API_Transfer StartTransfer(List<API_User> users)
+        {
+            int selection = -1;
+            while (selection != 0)
+            {
+                Console.WriteLine("-------------------------------------");
+                Console.WriteLine("Users");
+                Console.WriteLine("ID\t \tName");
+                Console.WriteLine("-------------------------------------");
+                foreach (API_User user in users)
+                {
+                    Console.WriteLine($"{user.UserId}:\t \t{user.Username}");
+                }
+                Console.WriteLine("-------------------------------------");
+                Console.WriteLine("");
+                API_Transfer transfer = new API_Transfer()
+                {
+                    UserFromID = UserService.GetUserId(),
+                    UserToID = UserToReceiveTransfer(users),
+                    TransferStatusID = 2, //Sending transfers default to approved and sending.
+                    TransferTypeID = 2,
+                    TransferAmount = AmountToTransfer()
+                };
+                return transfer;
+            }
+            return null;
         }
+
+        public int UserToReceiveTransfer(List<API_User> users)
+        {
+            int inputID = -1;
+            bool doneChoosingID = false;
+            while (!doneChoosingID)
+            {
+                Console.WriteLine("Enter ID of user you are sending to (0 to cancel):");
+
+                if (!int.TryParse(Console.ReadLine(), out inputID))
+                {
+                    Console.WriteLine("Invalid input. Only input a number.");
+                    continue;
+
+                }
+                if (inputID == 0)
+                {
+                    doneChoosingID = true;
+                    break;
+                }
+
+                if (!users.Any((u) => { return u.UserId == inputID; }))
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("Could not find a user with that ID");
+                    Console.WriteLine("");
+                    continue;
+                }
+                doneChoosingID = true;
+            }
+            return inputID;
+        }
+        public decimal AmountToTransfer()
+        {
+            decimal inputAmount = -1;
+            bool doneChoosingAmount = false;
+            while (!doneChoosingAmount)
+            {
+                Console.WriteLine("Enter Amount:");
+                if (!decimal.TryParse(Console.ReadLine(), out inputAmount))
+                {
+                    Console.WriteLine("Invalid input. Only input a valid amount.");
+                    continue;
+                }
+                if (inputAmount <= 0)
+                {
+                    Console.WriteLine("Invalid input. Only input a positive amount.");
+                    continue;
+                }
+                doneChoosingAmount = true;
+            }
+            return inputAmount;
+        }
+    }
+}

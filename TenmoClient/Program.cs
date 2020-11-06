@@ -89,70 +89,67 @@ namespace TenmoClient
                  if (menuSelection == 1) 
                 {
                     {
-                        API_Account account = apiService.GetAccounts();
-                        if (account != null)
-                        {
-                            Console.WriteLine($"Your current account balance is: {account.Balance.ToString("C2")}");
-                        }
+                        Console.WriteLine($"Your current account balance is: ${apiService.GetBalance()}");
+                        
 
                     }
                 }
                 else if (menuSelection == 2)
                 {
-                    List<TransferDetails> transferHistory = apiService.GetTransferHistory();
-                    var allTransferIDs = new List<int>();
-                    allTransferIDs.Add(0);
-                    Console.WriteLine("-------------------------------------------");
-                    Console.WriteLine("Transfer IDs         From/To         Amount");
-                    Console.WriteLine("-------------------------------------------");
-                    foreach (var item in transferHistory)
-                    {
-                        if (item.TransferId < 10)
-                        {
-                            if (item.FromUser == UserService.GetUsername())
-                            {
-                                Console.WriteLine($"0{item.TransferId}              To: {item.ToUser}             {item.Amount}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"0{item.TransferId}              From: {item.FromUser}             {item.Amount}");
-                            }
-                        }
-                        else
-                        {
-                            if (item.FromUser == UserService.GetUsername())
-                            {
-                                Console.WriteLine($"{item.TransferId}              To: {item.ToUser}             {item.Amount}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"{item.TransferId}              From: {item.FromUser}             {item.Amount}");
-                            }
-                        }
-                        allTransferIDs.Add(item.TransferId);
-                    }
-                    Console.WriteLine("-------------------------------------------");
-                    Console.WriteLine("Please enter transfer ID to view details (0 to cancel):");
-                    int transferId =ConsoleService.GetNumberInList(allTransferIDs);
+                    //List<TransferDetails> transferHistory = apiService.GetTransferHistory();
+                    //var allTransferIDs = new List<int>();
+                    //allTransferIDs.Add(0);
+                    //Console.WriteLine("-------------------------------------------");
+                    //Console.WriteLine("Transfer IDs         From/To         Amount");
+                    //Console.WriteLine("-------------------------------------------");
+                    //foreach (var item in transferHistory)
+                    //{
+                    //    if (item.TransferId < 10)
+                    //    {
+                    //        if (item.FromUser == UserService.GetUsername())
+                    //        {
+                    //            Console.WriteLine($"0{item.TransferId}              To: {item.ToUser}             {item.Amount}");
+                    //        }
+                    //        else
+                    //        {
+                    //            Console.WriteLine($"0{item.TransferId}              From: {item.FromUser}             {item.Amount}");
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (item.FromUser == UserService.GetUsername())
+                    //        {
+                    //            Console.WriteLine($"{item.TransferId}              To: {item.ToUser}             {item.Amount}");
+                    //        }
+                    //        else
+                    //        {
+                    //            Console.WriteLine($"{item.TransferId}              From: {item.FromUser}             {item.Amount}");
+                    //        }
+                    //    }
+                    //    allTransferIDs.Add(item.TransferId);
+                    //}
+                    //Console.WriteLine("-------------------------------------------");
+                    //Console.WriteLine("Please enter transfer ID to view details (0 to cancel):");
+                    //int transferId =ConsoleService.GetNumberInList(allTransferIDs);
 
-                    if (transferId != 0)
-                    {
-                        TransferDetails transfer = apiService.GetTransferById(transferId);
+                    //if (transferId != 0)
+                    //{
+                    //    TransferDetails transfer = apiService.GetTransferById(transferId);
 
-                        Console.WriteLine("-------------------------------------------");
-                        Console.WriteLine("Transfer details");
-                        Console.WriteLine("-------------------------------------------");
-                        Console.WriteLine($"ID: {transfer.TransferId}");
-                        Console.WriteLine($"From: {transfer.FromUser}");
-                        Console.WriteLine($"To: {transfer.ToUser}");
-                        Console.WriteLine($"Type: {transfer.TransferType}");
-                        Console.WriteLine($"Status: {transfer.TransferStatus}");
-                        Console.WriteLine($"Amount: {transfer.Amount}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Returning to the main menu.");
-                    }
+                    //    Console.WriteLine("-------------------------------------------");
+                    //    Console.WriteLine("Transfer details");
+                    //    Console.WriteLine("-------------------------------------------");
+                    //    Console.WriteLine($"ID: {transfer.TransferId}");
+                    //    Console.WriteLine($"From: {transfer.FromUser}");
+                    //    Console.WriteLine($"To: {transfer.ToUser}");
+                    //    Console.WriteLine($"Type: {transfer.TransferType}");
+                    //    Console.WriteLine($"Status: {transfer.TransferStatus}");
+                    //    Console.WriteLine($"Amount: {transfer.Amount}");
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine("Returning to the main menu.");
+                    //}
                 }
 
                 else if (menuSelection == 3)
@@ -161,47 +158,68 @@ namespace TenmoClient
                 }
                 else if (menuSelection == 4)
                 {
-                    List<API_User> users = apiService.ListUsers();
-                    var allUserIDs = new List<int>();
-                    int currentUserId = UserService.GetUserId();
-                    users.RemoveAt(currentUserId - 1);
 
-                    Console.WriteLine("-------------------------------------------");
-                    Console.WriteLine("User IDs     Names");
-                    Console.WriteLine("-------------------------------------------");
-                    foreach (var item in users)
                     {
-                        Console.WriteLine($"{item.UserId}           {item.Username}");
-                        allUserIDs.Add(item.UserId);
-                    }
-                    Console.WriteLine("-------------------------------------------");
-                    Console.WriteLine("Enter the ID of user you are sending to (0 to cancel):");
-                    int receiverId = ConsoleService.GetNumberInList(allUserIDs);
-
-                    if (receiverId != 0)
-                    {
-                        Console.WriteLine("Enter amount to send:");
-                        decimal amount = ConsoleService.GetAmount();
-                        TransferDetails result = apiService.SendMoney(receiverId, amount);
-
-                        if (result != null)
+                        List<API_User> users = apiService.ListUsers();
+                        int userID = UserService.GetUserId();
+                        API_Account accountFrom = apiService.GetAccount(userID);
+                        if (users != null && users.Count > 0)
                         {
-                            Console.WriteLine("Transfer successful! :)");
-                            Console.WriteLine("-------------------------------------------");
-                            Console.WriteLine("Transfer Details");
-                            Console.WriteLine("-------------------------------------------");
-                            Console.WriteLine($"ID: {result.TransferId}");
-                            Console.WriteLine($"From: {result.FromUser}");
-                            Console.WriteLine($"To: {result.ToUser}");
-                            Console.WriteLine($"Type: {result.TransferType}");
-                            Console.WriteLine($"Status: {result.TransferStatus}");
-                            Console.WriteLine($"Amount: {result.Amount}");
+                            API_Transfer transfer = consoleService.StartTransfer(users);
+                            if (transfer.TransferAmount > accountFrom.Balance)
+                            {
+                                Console.WriteLine("Insufficient Funds");
+                            }
+                            else
+                            {
+                                API_Transfer updatedTransfer = apiService.DoTransfer(transfer);
+                                apiService.UpdateBalance(updatedTransfer);
+                                Console.WriteLine("Amount has been transferred");
+                            }
                         }
-                        else
-                        {
-                            Console.WriteLine("Transfer not completed");
-                        }
+
                     }
+                    //List<API_User> users = apiService.ListUsers();
+                    //var allUserIDs = new List<int>();
+                    //int currentUserId = UserService.GetUserId();
+                    ////users.RemoveAt(currentUserId - 1);
+
+                    //Console.WriteLine("-------------------------------------------");
+                    //Console.WriteLine("User IDs     Names");
+                    //Console.WriteLine("-------------------------------------------");
+                    //foreach (var item in users)
+                    //{
+                    //    Console.WriteLine($"{item.UserId}           {item.Username}");
+                    //    allUserIDs.Add(item.UserId);
+                    //}
+                    //Console.WriteLine("-------------------------------------------");
+                    //Console.WriteLine("Enter the ID of user you are sending to (0 to cancel):");
+                    //int receiverId = ConsoleService.GetNumberInList(allUserIDs);
+
+                    //if (receiverId != 0)
+                    //{
+                    //    Console.WriteLine("Enter amount to send:");
+                    //    decimal amount = ConsoleService.GetAmount();
+                    //    TransferDetails result = apiService.SendMoney(receiverId, amount);
+
+                    //    if (result != null)
+                    //    {
+                    //        Console.WriteLine("Transfer successful! :)");
+                    //        Console.WriteLine("-------------------------------------------");
+                    //        Console.WriteLine("Transfer Details");
+                    //        Console.WriteLine("-------------------------------------------");
+                    //        Console.WriteLine($"ID: {result.TransferId}");
+                    //        Console.WriteLine($"From: {result.FromUser}");
+                    //        Console.WriteLine($"To: {result.ToUser}");
+                    //        Console.WriteLine($"Type: {result.TransferType}");
+                    //        Console.WriteLine($"Status: {result.TransferStatus}");
+                    //        Console.WriteLine($"Amount: {result.Amount}");
+                    //    }
+                    //    else
+                    //    {
+                    //        Console.WriteLine("Transfer not completed");
+                    //    }
+                    //}
                 }
 
                 else if (menuSelection == 5)

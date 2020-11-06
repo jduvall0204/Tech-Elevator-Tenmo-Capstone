@@ -18,40 +18,71 @@ namespace TenmoServer.Controllers
     {
 
         //private readonly ITransfersDAO TransfersDAO;
-        private readonly IAccountsDAO AccountsDAO;
+        private readonly IAccountsDAO AccountsSqlDAO;
 
-        public AccountController(IAccountsDAO accountsDAO)
+        public AccountController(IAccountsDAO _accountsDAO)
         {
-            AccountsDAO = accountsDAO;
+            AccountsSqlDAO = _accountsDAO;
 
         }
 
-        [HttpGet]
-        public ActionResult<Account> GetAccount()
+        [HttpGet("balance")]
+        public ActionResult<decimal> GetAccountBalance()
         {
-            int userId = GetId();
+            int currentID = int.Parse(User.FindFirst("sub").Value);
+            decimal balance = AccountsSqlDAO.GetBalance(currentID);
+            if (balance >= 0)
+            {
+                return Ok(balance);
+            }
+            else return NotFound();
+        }
 
-            Account account = AccountsDAO.GetAccounts(userId);
-
+        [HttpGet("{id}")]
+        public ActionResult<Account> GetAccount(int id)
+        {
+            Account account = AccountsSqlDAO.GetAccount(id);
             if (account != null)
             {
                 return Ok(account);
             }
-            else
-            {
-                return NotFound();
-            }
-
+            else return NotFound();
         }
 
-        public int GetId()
-        {
-            int userId = 0;
-            var tokenId = User.FindFirst("sub").Value;
+        //[HttpGet]
+        //public ActionResult<Account> GetAccount()
+        //{
+        //    try
+        //    {
+        //        int userId = GetId();
 
-            int.TryParse(tokenId, out userId);
+        //        Account account = AccountsSqlDAO.GetAccount(userId);
 
-            return userId;
-        }
+        //        if (account != null)
+        //        {
+        //            return Ok(account);
+        //        }
+        //        else
+        //        {
+        //            return NotFound();
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw e;
+        //    }
+
+
+        //}
+
+        //public int GetId()
+        //{
+        //    int userId = 0;
+        //    var tokenId = User.FindFirst("sub").Value;
+
+        //    int.TryParse(tokenId, out userId);
+
+        //    return userId;
+        //}
     }
 }
