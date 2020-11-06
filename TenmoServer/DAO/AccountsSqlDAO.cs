@@ -63,7 +63,7 @@ namespace TenmoServer.DAO
                     {
                         while (reader.Read())
                         {
-                            account.Balance = Convert.ToDecimal(reader["balance"]);
+                            account.balance = Convert.ToDecimal(reader["balance"]);
                         }
                     }
 
@@ -73,7 +73,7 @@ namespace TenmoServer.DAO
             {
                 throw;
             }
-            return account.Balance;
+            return account.balance;
         }
         //public Account GetAccounts(int id)
         //{
@@ -84,9 +84,9 @@ namespace TenmoServer.DAO
         {
             Account a = new Account()
             {
-                AccountId = Convert.ToInt32(reader["account_id"]),
-                UserId = Convert.ToInt32(reader["user_id"]),
-                Balance = Convert.ToDecimal(reader["balance"]),
+                accountId = Convert.ToInt32(reader["account_id"]),
+                userId = Convert.ToInt32(reader["user_id"]),
+                balance = Convert.ToDecimal(reader["balance"]),
             };
 
             return a;

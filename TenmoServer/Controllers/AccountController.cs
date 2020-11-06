@@ -49,40 +49,6 @@ namespace TenmoServer.Controllers
             else return NotFound();
         }
 
-        //[HttpGet]
-        //public ActionResult<Account> GetAccount()
-        //{
-        //    try
-        //    {
-        //        int userId = GetId();
-
-        //        Account account = AccountsSqlDAO.GetAccount(userId);
-
-        //        if (account != null)
-        //        {
-        //            return Ok(account);
-        //        }
-        //        else
-        //        {
-        //            return NotFound();
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw e;
-        //    }
-
-
-        //}
-
-        //public int GetId()
-        //{
-        //    int userId = 0;
-        //    var tokenId = User.FindFirst("sub").Value;
-
-        //    int.TryParse(tokenId, out userId);
-
-        //    return userId;
-        //}
+      
     }
 }

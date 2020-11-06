@@ -15,98 +15,113 @@ namespace TenmoServer.DAO
         {
             connectionString = dbConnectionString;
         }
-        public TransferWithDetails SendMoney(int senderId, int receiverId, decimal amount)
-        {
-            var transfer = new Transfer();
-            var returnTransfer = new TransferWithDetails();
 
+        public Transfer InsertTransfer(Transfer transfer)
+        {
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand("UPDATE accounts SET balance = balance - @amount WHERE user_id = @sender_id", conn);
-                    cmd.Parameters.AddWithValue("@sender_id", senderId);
-                    cmd.Parameters.AddWithValue("@amount", amount);
-                    cmd.ExecuteNonQuery();
+                    SqlCommand cmd = new SqlCommand("INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
+                        " OUTPUT Inserted.transfer_id" +
+                        " VALUES (@transfer_type_id, @transfer_status_id, @account_from, @account_to, @amount)", conn);
 
-                    cmd = new SqlCommand("UPDATE accounts SET balance = balance + @amount WHERE user_id = @receiver_id", conn);
-                    cmd.Parameters.AddWithValue("@receiver_id", receiverId);
-                    cmd.Parameters.AddWithValue("@amount", amount);
-                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("@transfer_type_id", transfer.TransferTypeID);
+                    cmd.Parameters.AddWithValue("@transfer_status_id", transfer.TransferStatusID);
+                    cmd.Parameters.AddWithValue("@account_from", transfer.UserFromID);
+                    cmd.Parameters.AddWithValue("@account_to", transfer.UserToID);
+                    cmd.Parameters.AddWithValue("@amount", transfer.TransferAmount);
 
-                    //transfer initial status is "approved"
-                    cmd = new SqlCommand("INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                    "VALUES (2, 2, @sender_id, @receiver_id, @amount)", conn);
-                    cmd.Parameters.AddWithValue("@sender_id", senderId);
-                    cmd.Parameters.AddWithValue("@receiver_id", receiverId);
-                    cmd.Parameters.AddWithValue("@amount", amount);
-                    cmd.ExecuteNonQuery();
-
-                    cmd = new SqlCommand("SELECT @@IDENTITY", conn);
-                    int transferId = Convert.ToInt32(cmd.ExecuteScalar());
-
-                    returnTransfer = GetTransfer(transferId);
+                    int transferID = (int)cmd.ExecuteScalar();
+                    transfer.TransferID = transferID;
                 }
             }
             catch (SqlException)
             {
-                Console.WriteLine("There was a problem with the database connection.");
+                throw;
             }
 
-            return returnTransfer;
+            return transfer;
         }
-
-        public List<TransferWithDetails> GetTransferHistory(int userId)
+        public List<Transfer> ListTransfers()
         {
-            var allTransfers = new List<TransferWithDetails>();
-
+            List<Transfer> transfers = new List<Transfer>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM transfers " +
-                    "WHERE account_from = @user_id OR account_to = @user_id", conn);
-                    cmd.Parameters.AddWithValue("@user_id", userId);
+                    SqlCommand cmd = new SqlCommand("SELECT transfer_id, a.username as userfrom, b.username as userto, transfers.transfer_type_id," +
+                                           " transfers.transfer_status_id, transfer_types.transfer_type_desc, transfer_statuses.transfer_status_desc," +
+                                           " account_from, account_to, amount" + " FROM transfers" +
+                                           " JOIN transfer_statuses ON transfer_statuses.transfer_status_id = transfers.transfer_status_id" +
+                                           " JOIN transfer_types ON transfer_types.transfer_type_id = transfers.transfer_type_id" +
+                                           " JOIN accounts AS f ON f.account_id = transfers.account_from" +
+                                           " JOIN accounts AS t ON t.account_id = transfers.account_to" +
+                                           " JOIN users AS a ON a.user_id = f.user_id" +
+                                           " JOIN users AS b ON b.user_id = t.user_id", conn);
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     if (reader.HasRows)
                     {
                         while (reader.Read())
                         {
-                            Transfer transfer = GetTransferFromReader(reader);
-                            TransferWithDetails details = GetDetailsFromTransfer(transfer);
-
-                            allTransfers.Add(details);
+                            Transfer t = GetTransferFromReader(reader);
+                            transfers.Add(t);
                         }
                     }
                 }
             }
             catch (SqlException)
             {
-                Console.WriteLine("There was a problem with the database connection.");
+                throw;
             }
-
-            return allTransfers;
+            return transfers;
         }
-        public TransferWithDetails GetTransfer(int transferId)
+        public Transfer GetTransferFromReader(SqlDataReader reader)
         {
-            var transfer = new Transfer();
+            Transfer transfer = new Transfer()
+            {
+                TransferID = Convert.ToInt32(reader["transfer_id"]),
+                TransferTypeID = Convert.ToInt32(reader["transfer_type_id"]),
+                TransferTypeDescription = Convert.ToString(reader["transfer_type_desc"]),
+                TransferStatusID = Convert.ToInt32(reader["transfer_status_id"]),
+                TransferStatusDescription = Convert.ToString(reader["transfer_status_desc"]),
+                UserFromID = Convert.ToInt32(reader["account_from"]),
+                UsernameFrom = Convert.ToString(reader["userfrom"]),
+                UserToID = Convert.ToInt32(reader["account_to"]),
+                UsernameTo = Convert.ToString(reader["userto"]),
+                TransferAmount = Convert.ToDecimal(reader["amount"])
 
+            };
+            return transfer;
+        }
+        public Transfer GetTransfer(int id)
+        {
+            Transfer transfer = null;
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM transfers " +
-                    "WHERE transfer_id = @transfer_id", conn);
-                    cmd.Parameters.AddWithValue("@transfer_id", transferId);
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlCommand cmd = new SqlCommand("SELECT transfer_id, a.username as userfrom, b.username as userto, transfers.transfer_type_id," +
+                                          " transfers.transfer_status_id, transfer_types.transfer_type_desc, transfer_statuses.transfer_status_desc," +
+                                          " account_from, account_to, amount" + " FROM transfers" +
+                                          " JOIN transfer_statuses ON transfer_statuses.transfer_status_id = transfers.transfer_status_id" +
+                                          " JOIN transfer_types ON transfer_types.transfer_type_id = transfers.transfer_type_id" +
+                                          " JOIN accounts AS f ON f.account_id = transfers.account_from" +
+                                          " JOIN accounts AS t ON t.account_id = transfers.account_to" +
+                                          " JOIN users AS a ON a.user_id = f.user_id" +
+                                          " JOIN users AS b ON b.user_id = t.user_id" +
+                                          " WHERE transfer_id = @id", conn);
 
+                    cmd.Parameters.AddWithValue("@id", id);
+                    SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.HasRows && reader.Read())
                     {
                         transfer = GetTransferFromReader(reader);
@@ -115,119 +130,49 @@ namespace TenmoServer.DAO
             }
             catch (SqlException)
             {
-                Console.WriteLine("There was a problem with the database connection.");
+                throw;
             }
-
-            return GetDetailsFromTransfer(transfer);
+            return transfer;
         }
-        public string GetTypeFromTransfer(int transferTypeId)
+        public Transfer UpdateBalance(Transfer transfer)
         {
-            string transferType = "";
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand("SELECT transfer_type_desc FROM transfer_types " +
-                    "WHERE transfer_type_id = @transfer_type_id", conn);
-                    cmd.Parameters.AddWithValue("@transfer_type_id", transferTypeId);
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlCommand cmd = conn.CreateCommand();
+                    SqlTransaction transaction = conn.BeginTransaction();
 
-                    if (reader.HasRows && reader.Read())
+                    cmd.Connection = conn;
+                    cmd.Transaction = transaction;
+
+                    cmd.Parameters.AddWithValue("@transferAmount", transfer.TransferAmount);
+
+                    cmd.CommandText = "UPDATE accounts" + " SET balance = (balance - @transferAmount)"
+                                       + " WHERE account_id = @accountFrom";
+                    cmd.Parameters.AddWithValue("@accountFrom", transfer.UserFromID);
+                    bool isSubtracted = cmd.ExecuteNonQuery() > 0;
+
+                    cmd.CommandText = "UPDATE accounts" + " SET balance = (balance + @transferAmount)"
+                                       + " WHERE account_id = @accountTo";
+                    cmd.Parameters.AddWithValue("@accountTo", transfer.UserToID);
+                    bool isAdded = cmd.ExecuteNonQuery() > 0;
+                    transaction.Commit();
+
+                    if (isSubtracted && isAdded)
                     {
-                        transferType = Convert.ToString(reader["transfer_type_desc"]);
+                        return transfer;
                     }
                 }
             }
             catch (SqlException)
             {
-                Console.WriteLine("There was a problem with the database connection.");
+                throw;
             }
-            return transferType;
+            return null;
         }
-
-        public string GetStatusFromTransfer(int transferStatusId)
-        {
-            string transferStatus = "";
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT transfer_status_desc FROM transfer_statuses " +
-                    "WHERE transfer_status_id = @transfer_status_id", conn);
-                    cmd.Parameters.AddWithValue("@transfer_status_id", transferStatusId);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.HasRows && reader.Read())
-                    {
-                        transferStatus = Convert.ToString(reader["transfer_status_desc"]);
-                    }
-                }
-            }
-            catch (SqlException)
-            {
-                Console.WriteLine("There was a problem with the database connection.");
-            }
-            return transferStatus;
-        }
-
-        public string GetUsernameFromAccount(int accountId)
-        {
-            User username = new User();
-
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    SqlCommand cmd = new SqlCommand("SELECT username FROM accounts " +
-                    "JOIN users ON accounts.user_id = users.user_id " +
-                    "WHERE account_id = @account_id", conn);
-                    cmd.Parameters.AddWithValue("@account_id", accountId);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.HasRows && reader.Read())
-                    {
-                        username.Username = Convert.ToString(reader["username"]);
-                    }
-                }
-            }
-            catch (SqlException)
-            {
-                Console.WriteLine("There was a problem with the database connection.");
-            }
-
-            return username.Username;
-        }
-        private Transfer GetTransferFromReader(SqlDataReader reader)
-        {
-            Transfer t = new Transfer();
-
-            t.TransferId = Convert.ToInt32(reader["transfer_id"]);
-            t.TransferTypeId = Convert.ToInt32(reader["transfer_type_id"]);
-            t.TransferStatusId = Convert.ToInt32(reader["transfer_status_id"]);
-            t.AccountFrom = Convert.ToInt32(reader["account_from"]);
-            t.AccountTo = Convert.ToInt32(reader["account_to"]);
-            t.Amount = Convert.ToDecimal(reader["amount"]);
-
-            return t;
-        }
-        private TransferWithDetails GetDetailsFromTransfer(Transfer transfer)
-        {
-            var transferDetails = new TransferWithDetails();
-
-            transferDetails.TransferId = transfer.TransferId;
-            transferDetails.TransferType = GetTypeFromTransfer(transfer.TransferTypeId);
-            transferDetails.TransferStatus = GetStatusFromTransfer(transfer.TransferStatusId);
-            transferDetails.FromUser = GetUsernameFromAccount(transfer.AccountFrom);
-            transferDetails.ToUser = GetUsernameFromAccount(transfer.AccountTo);
-            transferDetails.Amount = transfer.Amount;
-
-            return transferDetails;
-        }
+       
     }
 }
