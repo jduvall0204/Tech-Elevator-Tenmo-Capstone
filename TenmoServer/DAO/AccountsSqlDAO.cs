@@ -79,14 +79,14 @@ namespace TenmoServer.DAO
 
         private Account GetAccountFromReader(SqlDataReader reader) 
         {
-            Account a = new Account()
+            Account account = new Account()
             {
                 accountId = Convert.ToInt32(reader["account_id"]),
                 userId = Convert.ToInt32(reader["user_id"]),
                 balance = Convert.ToDecimal(reader["balance"]),
             };
 
-            return a;
+            return account;
         }
     }
 }
