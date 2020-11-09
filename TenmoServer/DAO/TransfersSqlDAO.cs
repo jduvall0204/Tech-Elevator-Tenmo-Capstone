@@ -25,8 +25,7 @@ namespace TenmoServer.DAO
                     conn.Open();
 
                     SqlCommand cmd = new SqlCommand("INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount)" +
-                        " OUTPUT Inserted.transfer_id" +
-                        " VALUES (@transfer_type_id, @transfer_status_id, @account_from, @account_to, @amount)", conn);
+                        " OUTPUT Inserted.transfer_id VALUES (@transfer_type_id, @transfer_status_id, @account_from, @account_to, @amount)", conn);
 
                     cmd.Parameters.AddWithValue("@transfer_type_id", transfer.TransferTypeID);
                     cmd.Parameters.AddWithValue("@transfer_status_id", transfer.TransferStatusID);
@@ -150,13 +149,11 @@ namespace TenmoServer.DAO
 
                     cmd.Parameters.AddWithValue("@transferAmount", transfer.TransferAmount);
 
-                    cmd.CommandText = "UPDATE accounts" + " SET balance = (balance - @transferAmount)"
-                                       + " WHERE account_id = @accountFrom";
+                    cmd.CommandText = "UPDATE accounts SET balance = (balance - @transferAmount) WHERE account_id = @accountFrom";
                     cmd.Parameters.AddWithValue("@accountFrom", transfer.UserFromID);
                     bool isSubtracted = cmd.ExecuteNonQuery() > 0;
 
-                    cmd.CommandText = "UPDATE accounts" + " SET balance = (balance + @transferAmount)"
-                                       + " WHERE account_id = @accountTo";
+                    cmd.CommandText = "UPDATE accounts SET balance = (balance + @transferAmount) WHERE account_id = @accountTo";
                     cmd.Parameters.AddWithValue("@accountTo", transfer.UserToID);
                     bool isAdded = cmd.ExecuteNonQuery() > 0;
                     transaction.Commit();

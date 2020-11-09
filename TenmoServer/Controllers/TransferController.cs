@@ -65,7 +65,7 @@ namespace TenmoServer.Controllers
                 return NotFound();
             }
             Transfer verifiedTransfer = TransfersSqlDAO.GetTransfer(transfer.TransferID);
-            if (verifiedTransfer.TransferStatusID == 2) //approved status ID
+            if (verifiedTransfer.TransferStatusID == 2) 
             {
                 TransfersSqlDAO.UpdateBalance(verifiedTransfer);
                 return Ok(transfer);

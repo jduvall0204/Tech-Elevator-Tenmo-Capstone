@@ -78,32 +78,32 @@ namespace TenmoClient
 
         public static int GetNumberInRange(int min, int max)
         {
-            string userInput = String.Empty;
-            int intValue = 0;
+            string userInput = ""; 
+            int value = 0;
             bool gettingNumberInRange = true;
 
             do
             {
                 userInput = Console.ReadLine();
-                if (!int.TryParse(userInput, out intValue))
+                if (!int.TryParse(userInput, out value))
                 {
                     Console.WriteLine("Invalid input format. Please try again");
                 }
                 else
                 {
-                    if (min <= intValue && intValue <= max)
+                    if (min <= value && value <= max)
                     {
                         gettingNumberInRange = false;
                     }
                     else
                     {
-                        Console.WriteLine($"Number you entered is not between {min} and {max}. Try again.");
+                        Console.WriteLine($"Number you entered is not between {min} and {max}. Please try again.");
                     }
                 }
             }
             while (gettingNumberInRange);
 
-            return intValue;
+            return value;
         }
 
         public API_Transfer StartTransfer(List<API_User> users)
@@ -113,11 +113,11 @@ namespace TenmoClient
             {
                 Console.WriteLine("-------------------------------------");
                 Console.WriteLine("Users");
-                Console.WriteLine("ID\t \tName");
+                Console.WriteLine("ID         Name");
                 Console.WriteLine("-------------------------------------");
                 foreach (API_User user in users)
                 {
-                    Console.WriteLine($"{user.UserId}:\t \t{user.Username}");
+                    Console.WriteLine($"{user.UserId}: {user.Username}");
                 }
                 Console.WriteLine("-------------------------------------");
                 Console.WriteLine("");
@@ -141,20 +141,20 @@ namespace TenmoClient
             {
                 Console.WriteLine("-------------------------------------");
                 Console.WriteLine("Transfers");
-                Console.WriteLine("ID From/To Amount");
+                Console.WriteLine("ID        From/To      Amount");
                 Console.WriteLine("-------------------------------------");
                 foreach (API_Transfer transfer in transfers)
                 {
                     if (transfer.userFromID == UserService.GetUserId())
                     {
-                        Console.WriteLine($"{transfer.transferID} To: {transfer.usernameTo}${transfer.transferAmount}");
+                        Console.WriteLine($"{transfer.transferID} To: {transfer.usernameTo} ${transfer.transferAmount}");
                     }
                     else if (transfer.userFromID != UserService.GetUserId())
                     {
-                        Console.WriteLine($"{transfer.transferID} From: {transfer.usernameFrom}${transfer.transferAmount}");
+                        Console.WriteLine($"{transfer.transferID} From: {transfer.usernameFrom} ${transfer.transferAmount}");
                     }
                 }
-                selection = 0;
+                break;
             }
         }
         public void WriteTransferDetail(List<API_Transfer> transfers, int id)
@@ -180,24 +180,19 @@ namespace TenmoClient
         public int TransferToDetail(List<API_Transfer> transfers)
         {
             int inputID = -1;
-            bool doneChoosingID = false;
-            while (!doneChoosingID)
-            {
+            bool choosingID = false;
+            while (!choosingID)
+               
+            {              
                 Console.WriteLine("Please enter transfer ID to view details (0 to cancel): ");
-                if (!int.TryParse(Console.ReadLine(), out inputID))
+
                 {
-                    Console.WriteLine("Invalid input. Only input a number.");
-                    continue;
+                    if (!int.TryParse(Console.ReadLine(), out inputID))
+                    {
+                        Console.WriteLine("Invalid input. Only input a number.");
+                    }
+                    choosingID = true;
                 }
-                //TODO simplify this
-                if (!transfers.Any((u) => { return u.transferID == inputID; }))
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("Could not find a user with that ID");
-                    Console.WriteLine("");
-                    continue;
-                }
-                doneChoosingID = true;
             }
             return inputID;
         }
@@ -218,52 +213,41 @@ namespace TenmoClient
         public int UserToReceiveTransfer(List<API_User> users)
         {
             int inputID = -1;
-            bool doneChoosingID = false;
-            while (!doneChoosingID)
+            bool choosingID = false;
+            while (!choosingID)
             {
                 Console.WriteLine("Enter ID of user you are sending to (0 to cancel):");
-
+                
                 if (!int.TryParse(Console.ReadLine(), out inputID))
                 {
                     Console.WriteLine("Invalid input. Only input a number.");
-                    continue;
 
                 }
                 if (inputID == 0)
                 {
-                    doneChoosingID = true;
+                    choosingID = true;
                     break;
                 }
-
-                if (!users.Any((u) => { return u.UserId == inputID; }))
-                {
-                    Console.WriteLine("");
-                    Console.WriteLine("Could not find a user with that ID");
-                    Console.WriteLine("");
-                    continue;
-                }
-                doneChoosingID = true;
+                choosingID = true;
             }
             return inputID;
         }
         public decimal AmountToTransfer()
         {
             decimal inputAmount = -1;
-            bool doneChoosingAmount = false;
-            while (!doneChoosingAmount)
+            bool choosingAmount = false;
+            while (!choosingAmount)
             {
                 Console.WriteLine("Enter Amount:");
                 if (!decimal.TryParse(Console.ReadLine(), out inputAmount))
                 {
                     Console.WriteLine("Invalid input. Only input a valid amount.");
-                    continue;
                 }
                 if (inputAmount <= 0)
                 {
                     Console.WriteLine("Invalid input. Only input a positive amount.");
-                    continue;
                 }
-                doneChoosingAmount = true;
+                choosingAmount = true;
             }
             return inputAmount;
         }
