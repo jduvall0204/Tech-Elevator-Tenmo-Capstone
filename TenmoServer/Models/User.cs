@@ -10,10 +10,7 @@ namespace TenmoServer.Models
         public string Salt { get; set; }
         public string Email { get; set; }
 
-        public override string ToString()
-        {
-            return UserId.ToString() + Username;
-        }
+       
     }
 
     /// <summary>
@@ -26,12 +23,7 @@ namespace TenmoServer.Models
         //public string Role { get; set; }
         public string Token { get; set; }
 
-        //created this method twice as I am unsure currently which one we will want to call on to display user info.  
-        //since these are separate classes, easier to put it twice and delete what we dont need.
-        public override string ToString()
-        {
-            return UserId.ToString() + Username;
-        }
+        
     }
 
     

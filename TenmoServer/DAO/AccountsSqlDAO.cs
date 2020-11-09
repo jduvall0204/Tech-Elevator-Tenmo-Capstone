@@ -28,17 +28,17 @@ namespace TenmoServer.DAO
 
                     SqlCommand cmd = new SqlCommand("SELECT account_id, user_id, balance FROM accounts " +
                         "WHERE user_id = @user_id", conn);
-                    cmd.Parameters.AddWithValue("@user_id", userId); // replace @user_id with userId
-                    SqlDataReader reader = cmd.ExecuteReader(); // send back a result that i can read
+                    cmd.Parameters.AddWithValue("@user_id", userId); 
+                    SqlDataReader reader = cmd.ExecuteReader(); 
 
                     if (reader.HasRows && reader.Read())
                     {
-                        account = GetAccountFromReader(reader); // reading the data into an account object
+                        account = GetAccountFromReader(reader);
                     }
                 }
             }
             catch (SqlException)
-            { // todo wont write to console--send error codes
+            { 
                 Console.WriteLine("There was a problem with the database connection.");
             }
 
@@ -75,12 +75,9 @@ namespace TenmoServer.DAO
             }
             return account.balance;
         }
-        //public Account GetAccounts(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
+       
 
-        private Account GetAccountFromReader(SqlDataReader reader) // making the data into an account object 
+        private Account GetAccountFromReader(SqlDataReader reader) 
         {
             Account a = new Account()
             {

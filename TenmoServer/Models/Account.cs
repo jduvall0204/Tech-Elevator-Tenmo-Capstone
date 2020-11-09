@@ -16,8 +16,4 @@ namespace TenmoServer.Models
 
         
     }
-    public class AccountUserName
-    {
-        public string username { get; set; }
-    }
 }
